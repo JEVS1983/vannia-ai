@@ -1,4 +1,4 @@
-name: Build Android Vannia AI
+name: Build Vannia AI Android
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Install system deps
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y git zip unzip openjdk-17-jdk python3-pip
@@ -25,12 +25,13 @@ jobs:
     - name: Install Buildozer
       run: |
         pip install --upgrade pip
-        pip install buildozer cython==0.29.36
+        pip install cython==0.29.36 buildozer
 
-    - name: Accept Android licenses
+    - name: Pre-accept Android licenses (FORCE)
       run: |
-        yes | sudo /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
+        mkdir -p $HOME/.android
+        touch $HOME/.android/repositories.cfg
 
     - name: Build Android AAB
       run: |
-        buildozer android release
+        buildozer -v android release
