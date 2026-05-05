@@ -8,8 +8,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      ANDROID_HOME: ${{ github.workspace }}/android-sdk
+      ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
+
     steps:
-    - name: Checkout repo
+    - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Setup Python
@@ -17,36 +21,28 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         sudo apt update
-        sudo apt install -y git zip unzip openjdk-17-jdk python3-pip
+        sudo apt install -y \
+          git zip unzip openjdk-17-jdk \
+          build-essential libffi-dev libssl-dev \
+          python3-pip
 
-    - name: Install Buildozer
+    - name: Upgrade pip
       run: |
-        pip install --upgrade pip
-        pip install cython==0.29.36 buildozer
+        pip install --upgrade pip setuptools wheel
 
-    - name: Accept Android licenses
+    - name: Install Buildozer and Cython
+      run: |
+        pip install buildozer cython==0.29.36
+
+    # 🔥 FIX CLAVE: evita bloqueo de licencias SDK
+    - name: Pre-create Android config (NO interactive license)
       run: |
         mkdir -p $HOME/.android
         touch $HOME/.android/repositories.cfg
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-    - name: Cache Buildozer
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.buildozer
-          ~/.gradle
-          $ANDROID_HOME/build-tools
-        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
-        restore-keys: |
-          ${{ runner.os }}-buildozer-
-
-    - name: Build Android AAB
+    - name: Build Android (Release AAB/APK)
       run: |
         buildozer -v android release
