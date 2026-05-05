@@ -1,19 +1,31 @@
-name: Build Android
+name: Build Android (Vannia AI)
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
     - name: Setup Python
       run: |
         sudo apt update
-        sudo apt install -y python3-pip
-        pip install buildozer
+        sudo apt install -y python3-pip python3-setuptools python3-wheel
+        pip install --upgrade pip
 
-    - name: Build AAB
-      run: buildozer android release
+    - name: Install Buildozer + dependencies
+      run: |
+        pip install buildozer cython==0.29.36
+
+    - name: Install system dependencies
+      run: |
+        sudo apt install -y git zip unzip openjdk-17-jdk
+
+    - name: Build APK/AAB
+      run: |
+        buildozer android release
