@@ -17,6 +17,9 @@ jobs:
       with:
         python-version: "3.10"
 
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: Install dependencies
       run: |
         sudo apt update
@@ -27,10 +30,22 @@ jobs:
         pip install --upgrade pip
         pip install cython==0.29.36 buildozer
 
-    - name: Pre-accept Android licenses (FORCE)
+    - name: Accept Android licenses
       run: |
         mkdir -p $HOME/.android
         touch $HOME/.android/repositories.cfg
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+    - name: Cache Buildozer
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.buildozer
+          ~/.gradle
+          $ANDROID_HOME/build-tools
+        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+        restore-keys: |
+          ${{ runner.os }}-buildozer-
 
     - name: Build Android AAB
       run: |
