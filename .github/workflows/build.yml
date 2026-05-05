@@ -1,4 +1,4 @@
-name: Build Vannia AI Android Stable
+name: Build Vannia AI Android
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
       ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
 
     steps:
-    - name: Checkout repo
+    - name: Checkout
       uses: actions/checkout@v4
 
     - name: Setup Python
@@ -20,7 +20,7 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Install system packages
+    - name: Install system dependencies
       run: |
         sudo apt update
         sudo apt install -y git zip unzip openjdk-17-jdk python3-pip
@@ -30,13 +30,13 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
 
-    - name: Force Android SDK env
+    - name: Prevent SDK license blocking
       run: |
         mkdir -p $HOME/.android
         touch $HOME/.android/repositories.cfg
 
-    # 🔥 FIX CLAVE: usa build-tools 34 (ESTABLE)
-    - name: Install stable Android tools
+    # 🔥 CLAVE: fijar SDK estable
+    - name: Install Android SDK (stable)
       run: |
         yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT \
           "platform-tools" \
