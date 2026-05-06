@@ -1,4 +1,4 @@
-name: Build Vannia AI Android FIX
+name: Build Vannia AI Android FINAL FIX
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Install system deps
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y git zip unzip wget openjdk-17-jdk python3-pip
@@ -30,11 +30,11 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.36 python-for-android
 
-    - name: Clean project
+    - name: Clean build
       run: |
         rm -rf .buildozer
 
-    # 🔥 SDK CORRECTO (NO 37)
+    # 🔥 ANDROID SDK CORRECTO (SIN 37)
     - name: Install Android SDK
       run: |
         mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
@@ -48,7 +48,7 @@ jobs:
 
         export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
 
-        # 🔥 AUTO-ACCEPT LICENSES
+        # 🔥 AUTO ACCEPT LICENSES (CRÍTICO)
         yes | sdkmanager --licenses || true
 
         # 🔥 SDK ESTABLE (NO 37)
