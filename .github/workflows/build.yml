@@ -1,4 +1,4 @@
-name: Build Vannia AI Android
+name: Build Vannia AI Android STABLE
 
 on:
   push:
@@ -25,13 +25,19 @@ jobs:
         sudo apt update
         sudo apt install -y git zip unzip wget openjdk-17-jdk python3-pip
 
-    - name: Install Buildozer
+    - name: Install Buildozer + p4a
       run: |
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
+        pip install python-for-android
 
-    # 🔥 INSTALAR CMDLINE TOOLS (ARREGLA sdkmanager)
-    - name: Install Android SDK Command Line Tools
+    # 🔥 LIMPIEZA SEGURA (NO BUILD ANDROID CLEAN)
+    - name: Clean only build cache
+      run: |
+        rm -rf .buildozer
+
+    # 🔥 INSTALL ANDROID SDK (MANUAL CONTROLADO)
+    - name: Install Android SDK
       run: |
         mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
         cd $ANDROID_SDK_ROOT
@@ -42,26 +48,17 @@ jobs:
         mkdir -p cmdline-tools/latest
         mv cmdline-tools/* cmdline-tools/latest/ || true
 
-    # 🔥 AGREGAR SDKMANAGER AL PATH
-    - name: Setup PATH
-      run: |
-        echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
-        echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
+        export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
 
-    # 🔥 ACEPTAR LICENCIAS
-    - name: Accept Android licenses
-      run: |
         yes | sdkmanager --licenses || true
 
-    # 🔥 INSTALAR SDK ESTABLE (NO 37)
-    - name: Install Android SDK
-      run: |
         sdkmanager \
           "platform-tools" \
           "platforms;android-34" \
           "build-tools;34.0.0"
 
-    - name: Build APK/AAB
+    # 🔥 BUILD SIN CLEAN (CRÍTICO)
+    - name: Build APK
       run: |
-        buildozer android clean
+        buildozer android update
         buildozer -v android release
