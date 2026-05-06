@@ -10,12 +10,12 @@ source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
 
 # =========================
-# 🔥 DEPENDENCIAS PYTHON
+# 🧠 PYTHON DEPENDENCIAS
 # =========================
 requirements = python3,kivy,pillow,gtts
 
 # =========================
-# 📱 CONFIG ANDROID
+# 📱 ANDROID CONFIG ESTABLE
 # =========================
 orientation = portrait
 
@@ -23,30 +23,28 @@ android.api = 34
 android.minapi = 21
 android.ndk = 25b
 
-# IMPORTANTE: evita conflictos con SDK nuevo
+# 🔥 CLAVE: evitar SDK automático problemático
 android.sdk = 34
 
-# Arquitecturas (compatibilidad Play Store)
+# Arquitecturas Play Store
 android.archs = arm64-v8a, armeabi-v7a
 
 # Permisos básicos
 android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
 
-# Generar AAB (Play Store recomendado)
+# Generar AAB (Play Store)
 android.release_artifact = aab
 
 # =========================
-# ⚙️ BUILD CONFIG
+# ⚙️ FIX IMPORTANTE CI/CD
 # =========================
-log_level = 2
-warn_on_root = 1
-
-# Evita rebuilds innecesarios
-p4a.branch = master
-
-# =========================
-# 🧠 FIX IMPORTANTE SDK
-# =========================
-# Evita que intente usar build-tools 37
+# Evita conflictos con versiones nuevas de SDK
 android.enable_androidx = True
 android.use_androidx = True
+
+# 🔥 IMPORTANTE: fuerza comportamiento estable
+p4a.branch = master
+
+# Logs más claros
+log_level = 2
+warn_on_root = 1
