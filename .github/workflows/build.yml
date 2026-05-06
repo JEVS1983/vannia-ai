@@ -9,32 +9,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: 📥 Checkout repo
       uses: actions/checkout@v4
 
-    - name: Setup Python
+    - name: 🐍 Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
 
-    - name: Install system dependencies
+    - name: ⚙️ Install system dependencies
       run: |
         sudo apt update
         sudo apt install -y \
           zip unzip openjdk-17-jdk \
           python3-pip git \
           libffi-dev libssl-dev \
-          build-essential
+          build-essential \
+          libsqlite3-dev zlib1g-dev
 
-    - name: Install Buildozer
+    - name: 📦 Install Buildozer
       run: |
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
 
-    # ⚠️ IMPORTANTE: NO SDK MANUAL
-    # ⚠️ NO sdkmanager
-    # ⚠️ NO ANDROID_SDK_ROOT
+    # 🔥 FIX CLAVE: evitar bloqueo de licencias Android
+    - name: 🔓 Prepare Android license acceptance
+      run: |
+        mkdir -p ~/.android
+        echo "### User Sources for Android SDK Manager" > ~/.android/repositories.cfg
 
-    - name: Build APK
+    # 🔥 PRIMER RUN: descarga SDK + acepta licencias (puede fallar y es normal)
+    - name: ⚙️ Initial build (SDK setup)
+      run: |
+        buildozer android debug || true
+
+    # 🚀 BUILD REAL (ya con SDK listo)
+    - name: 📱 Build APK (release)
       run: |
         buildozer android release
