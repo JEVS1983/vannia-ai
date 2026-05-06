@@ -3,88 +3,77 @@ name: Build Vannia AI Android
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-22.04
 
     steps:
-    # 📥 Clonar repo
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
 
-    # 🐍 Python estable
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-    # ☕ Java optimizado (sin apt)
-    - name: Set up Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: "temurin"
-        java-version: "17"
+      - name: ⚙️ Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            build-essential \
+            git \
+            zip unzip \
+            openjdk-17-jdk \
+            python3-pip \
+            libffi-dev \
+            libssl-dev
 
-    # ⚡ Cache (acelera muchísimo)
-    - name: Cache Buildozer
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.buildozer
-          .buildozer
-        key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
-        restore-keys: |
-          buildozer-${{ runner.os }}
+      - name: 📦 Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install buildozer cython
 
-    # 📦 Dependencias
-    - name: Install system dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y zip unzip git build-essential libffi-dev libssl-dev
-        pip install --upgrade pip
-        pip install buildozer cython
+      # 🔥 FIX CRÍTICO: instalar correctamente Android SDK + sdkmanager
+      - name: 📲 Setup Android SDK
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk
 
-    # 📱 Instalar Android SDK (nuevo formato)
-    - name: Install Android SDK
-      run: |
-        mkdir -p android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip commandlinetools-linux-9477386_latest.zip
 
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-        unzip -q commandlinetools-linux-9477386_latest.zip -d android-sdk/cmdline-tools
+          mkdir -p cmdline-tools/latest
+          mv cmdline-tools/* cmdline-tools/latest/ || true
 
-        mv android-sdk/cmdline-tools/cmdline-tools android-sdk/cmdline-tools/latest
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
 
-    # 📜 Instalar paquetes SDK (FIX sdkmanager)
-    - name: Install SDK packages
-      run: |
-        SDK="$GITHUB_WORKSPACE/android-sdk/cmdline-tools/latest/bin/sdkmanager"
+      # 🔥 FIX: aceptar licencias correctamente
+      - name: ✅ Accept licenses
+        run: |
+          yes | sdkmanager --licenses
 
-        chmod +x $SDK
+      # 🔥 instalar componentes necesarios
+      - name: 📥 Install SDK components
+        run: |
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-33"
+          sdkmanager "build-tools;33.0.2"
 
-        yes | $SDK --licenses
+      # 🔥 evitar bug de buildozer con tools/bin
+      - name: 🔧 Fix sdkmanager path (Buildozer bug)
+        run: |
+          mkdir -p $HOME/android-sdk/tools/bin
+          ln -s $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/android-sdk/tools/bin/sdkmanager
 
-        $SDK --sdk_root=$GITHUB_WORKSPACE/android-sdk \
-          "platform-tools" \
-          "platforms;android-33" \
-          "build-tools;33.0.2"
+      - name: 🚀 Build APK / AAB
+        run: |
+          buildozer android release
 
-    # 🌍 Variables de entorno
-    - name: Set Android environment
-      run: |
-        echo "ANDROID_SDK_ROOT=$GITHUB_WORKSPACE/android-sdk" >> $GITHUB_ENV
-        echo "ANDROID_HOME=$GITHUB_WORKSPACE/android-sdk" >> $GITHUB_ENV
-        echo "PATH=$GITHUB_WORKSPACE/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
-        echo "PATH=$GITHUB_WORKSPACE/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
-
-    # 🛠️ Build
-    - name: Build APK / AAB
-      run: |
-        buildozer android release
-
-    # 📦 Guardar resultado
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: android-build
-        path: bin/*.aab
+      - name: 📤 Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vannia-ai-build
+          path: bin/*.aab
