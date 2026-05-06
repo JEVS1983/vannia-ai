@@ -1,58 +1,84 @@
-name: Build Vannia AI Android (REAL FAST)
+name: Build Vannia AI Android (FAST FIXED)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-22.04
 
+    env:
+      ANDROID_HOME: ${{ github.workspace }}/android-sdk
+      ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
+
     steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      - name: 🐍 Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
+    # 🔥 Python correcto (NO 3.1)
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-      # 🔥 CACHE REAL (EL IMPORTANTE)
-      - name: ⚡ Cache buildozer (SDK + NDK + compilación)
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.buildozer
-            ./.buildozer
-          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
-          restore-keys: |
-            buildozer-${{ runner.os }}-
+    # ⚡ CACHE (CLAVE PARA VELOCIDAD)
+    - name: Cache buildozer & sdk
+      uses: actions/cache@v3
+      with:
+        path: |
+          .buildozer
+          android-sdk
+          ~/.buildozer
+        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
 
-      - name: ⚙️ Dependencias mínimas
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y openjdk-17-jdk zip unzip git
+    # 🔥 Instalar dependencias MINIMAS (sin basura)
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          git zip unzip \
+          openjdk-17-jdk \
+          libffi-dev libssl-dev \
+          python3-pip
 
-      - name: 📦 Python deps
-        run: |
-          pip install --upgrade pip
-          pip install buildozer cython
+        pip install --upgrade pip
+        pip install buildozer cython
 
-      # 🔥 CLAVE: evitar reinstalación del SDK
-      - name: 🚫 Disable SDK auto-download
-        run: |
-          export BUILDOZER_ALLOW_SDK_DOWNLOAD=0
-          export BUILDOZER_ALLOW_NDK_DOWNLOAD=0
-          echo "BUILDOZER_ALLOW_SDK_DOWNLOAD=0" >> $GITHUB_ENV
-          echo "BUILDOZER_ALLOW_NDK_DOWNLOAD=0" >> $GITHUB_ENV
+    # 🔥 Instalar SDK CORRECTAMENTE (sin freeze)
+    - name: Install Android SDK
+      run: |
+        mkdir -p $ANDROID_HOME/cmdline-tools
 
-      - name: 🚀 Build
-        run: |
-          buildozer android release
+        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O sdk.zip
+        unzip -q sdk.zip -d $ANDROID_HOME/cmdline-tools
 
-      - name: 📤 Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vannia-ai
-          path: bin/*.aab
+        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+
+        echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
+    # 🔥 Licencias SIN BLOQUEO
+    - name: Accept licenses
+      run: yes | sdkmanager --licenses || true
+
+    # 🔥 Instalar paquetes necesarios
+    - name: Install SDK packages
+      run: |
+        sdkmanager "platform-tools" \
+                   "platforms;android-33" \
+                   "build-tools;33.0.2"
+
+    # 🚀 BUILD
+    - name: Build APK / AAB
+      run: |
+        buildozer android release
+
+    # 📦 Guardar resultado
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-build
+        path: bin/*.aab
