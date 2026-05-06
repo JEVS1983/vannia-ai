@@ -25,7 +25,7 @@ jobs:
         sudo apt update
         sudo apt install -y zip unzip openjdk-17-jdk wget git
 
-    # 🔥 INSTALAR SDK
+    # 🔥 INSTALAR ANDROID SDK (BIEN HECHO)
     - name: Install Android SDK
       run: |
         mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
@@ -35,14 +35,17 @@ jobs:
         unzip sdk.zip -d cmdline-tools
         mv cmdline-tools/cmdline-tools cmdline-tools/latest
 
-    # 🔥 CONFIGURAR PATH GLOBAL (IMPORTANTE)
-    - name: Set SDK paths
+    # 🔥 CONFIGURAR VARIABLES Y PATH
+    - name: Configure SDK paths
       run: |
         echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+        echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+        echo "ANDROIDSDK=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+
         echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
         echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
 
-    # 🔥 LICENCIAS + TODO LO NECESARIO
+    # 🔥 ACEPTAR LICENCIAS + INSTALAR TODO
     - name: Accept licenses and install SDK components
       run: |
         export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
@@ -60,7 +63,12 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
 
-    # 🚀 BUILD FINAL
+    # 🚀 BUILD FINAL (CLAVE)
     - name: Build APK
       run: |
+        export ANDROIDSDK=$ANDROID_SDK_ROOT
+        export ANDROID_HOME=$ANDROID_SDK_ROOT
+        export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.2.9519653
+        export PATH=$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+
         buildozer -v android release
