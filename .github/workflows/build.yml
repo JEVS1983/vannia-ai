@@ -1,4 +1,4 @@
-name: Build Vannia AI Android (FAST)
+name: Build Vannia AI Android (REAL FAST)
 
 on:
   push:
@@ -18,20 +18,18 @@ jobs:
         with:
           python-version: "3.10"
 
-      # 🔥 CACHE PRINCIPAL (CLAVE)
-      - name: ⚡ Cache buildozer + SDK
+      # 🔥 CACHE REAL (EL IMPORTANTE)
+      - name: ⚡ Cache buildozer (SDK + NDK + compilación)
         uses: actions/cache@v4
         with:
           path: |
             ~/.buildozer
-            ~/.gradle
-            ~/.android
-            ~/android-sdk
+            ./.buildozer
           key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
           restore-keys: |
             buildozer-${{ runner.os }}-
 
-      - name: ⚙️ Dependencias mínimas (más rápido)
+      - name: ⚙️ Dependencias mínimas
         run: |
           sudo apt-get update -y
           sudo apt-get install -y openjdk-17-jdk zip unzip git
@@ -41,41 +39,13 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython
 
-      # 🔥 SOLO instala SDK si NO existe (clave velocidad)
-      - name: 📲 Setup Android SDK (cached)
+      # 🔥 CLAVE: evitar reinstalación del SDK
+      - name: 🚫 Disable SDK auto-download
         run: |
-          if [ ! -d "$HOME/android-sdk" ]; then
-            echo "Instalando SDK..."
-            mkdir -p $HOME/android-sdk/cmdline-tools
-            cd $HOME/android-sdk
-
-            wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-            unzip commandlinetools-linux-9477386_latest.zip
-
-            mkdir -p cmdline-tools/latest
-            mv cmdline-tools/* cmdline-tools/latest/ || true
-          else
-            echo "SDK cacheado 👍"
-          fi
-
-          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
-
-      - name: ✅ Licencias (rápido si cacheado)
-        run: |
-          yes | sdkmanager --licenses || true
-
-      - name: 📥 SDK components
-        run: |
-          sdkmanager "platform-tools" || true
-          sdkmanager "platforms;android-33" || true
-          sdkmanager "build-tools;33.0.2" || true
-
-      # 🔥 FIX buildozer bug
-      - name: 🔧 Fix sdkmanager path
-        run: |
-          mkdir -p $HOME/android-sdk/tools/bin
-          ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/android-sdk/tools/bin/sdkmanager
+          export BUILDOZER_ALLOW_SDK_DOWNLOAD=0
+          export BUILDOZER_ALLOW_NDK_DOWNLOAD=0
+          echo "BUILDOZER_ALLOW_SDK_DOWNLOAD=0" >> $GITHUB_ENV
+          echo "BUILDOZER_ALLOW_NDK_DOWNLOAD=0" >> $GITHUB_ENV
 
       - name: 🚀 Build
         run: |
