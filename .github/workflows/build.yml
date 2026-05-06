@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 📥 Checkout repo
+    - name: 📥 Checkout
       uses: actions/checkout@v4
 
     - name: 🐍 Setup Python
@@ -17,7 +17,7 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: ⚙️ Install system dependencies
+    - name: ⚙️ Install dependencies
       run: |
         sudo apt update
         sudo apt install -y \
@@ -32,18 +32,23 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
 
-    # 🔥 FIX CLAVE: evitar bloqueo de licencias Android
-    - name: 🔓 Prepare Android license acceptance
+    # 🔥 SOLUCIÓN CLAVE REAL
+    - name: 🔓 Accept Android licenses (manual fix)
       run: |
         mkdir -p ~/.android
-        echo "### User Sources for Android SDK Manager" > ~/.android/repositories.cfg
+        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
 
-    # 🔥 PRIMER RUN: descarga SDK + acepta licencias (puede fallar y es normal)
-    - name: ⚙️ Initial build (SDK setup)
+        echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        echo "84831b9409646a918e30573bab4c9c91346d8abd" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+
+        touch ~/.android/repositories.cfg
+
+    # 🔧 PRIMER RUN (instala SDK completo)
+    - name: ⚙️ Initial setup
       run: |
         buildozer android debug || true
 
-    # 🚀 BUILD REAL (ya con SDK listo)
-    - name: 📱 Build APK (release)
+    # 🚀 BUILD FINAL
+    - name: 📱 Build APK
       run: |
         buildozer android release
