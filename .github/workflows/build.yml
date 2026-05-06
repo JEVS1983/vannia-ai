@@ -1,71 +1,49 @@
-name: Build Vannia AI Android FINAL
+[app]
 
-on:
-  push:
-    branches: [ main ]
+# (str) Title of your application
+title = Vannia AI
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# (str) Package name
+package.name = vanniaai
 
-    env:
-      ANDROID_HOME: /home/runner/android-sdk
-      ANDROID_SDK_ROOT: /home/runner/android-sdk
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+# (str) Package domain
+package.domain = org.vannia
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+# (str) Source code where the main.py live
+source.dir = .
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.10"
+# (list) Source files to include
+source.include_exts = py,png,jpg,kv
 
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y zip unzip openjdk-17-jdk python3-pip wget
+# (str) Application versioning
+version = 1.0
 
-    - name: Install Buildozer
-      run: |
-        pip install --upgrade pip
-        pip install buildozer cython==0.29.36
+# (list) Application requirements
+requirements = python3,kivy
 
-    # 🔥 SDK GLOBAL (NO local)
-    - name: Install Android SDK
-      run: |
-        mkdir -p /home/runner/android-sdk/cmdline-tools
-        cd /home/runner/android-sdk
-        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O sdk.zip
-        unzip sdk.zip -d cmdline-tools
-        mv cmdline-tools/cmdline-tools cmdline-tools/latest
+# (str) Supported orientation
+orientation = portrait
 
-    - name: Add SDK to PATH
-      run: |
-        echo "/home/runner/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-        echo "/home/runner/android-sdk/platform-tools" >> $GITHUB_PATH
+# (bool) Fullscreen mode
+fullscreen = 0
 
-    # 🔥 LICENCIAS (AQUÍ ESTABA TU BLOQUEO)
-    - name: Accept licenses
-      run: yes | sdkmanager --licenses
+# 🔥 ANDROID CONFIG CORRECTO
+android.api = 33
+android.minapi = 21
+android.ndk = 25b
 
-    # 🔥 VERSIONES COMPATIBLES (NO 37)
-    - name: Install SDK packages
-      run: |
-        sdkmanager \
-          "platform-tools" \
-          "platforms;android-33" \
-          "build-tools;33.0.2"
+# ⚠️ Aunque salga warning, lo dejamos fijo
+android.sdk = 33
 
-    # 🔥 FORZAR A BUILDOZER A USAR ESTE SDK
-    - name: Force SDK path for Buildozer
-      run: |
-        mkdir -p ~/.buildozer/android/platform
-        ln -s /home/runner/android-sdk ~/.buildozer/android/platform/android-sdk
+# 🔥 Acepta licencias automáticamente (ayuda pero NO suficiente solo)
+android.accept_sdk_license = True
 
-    - name: Clean build
-      run: buildozer android clean
+# 🔥 NUEVO FORMATO (evita warning deprecado)
+android.archs = arm64-v8a
 
-    - name: Build APK
-      run: buildozer -v android release
+# 🔥 IMPORTANTE estabilidad
+p4a.branch = stable
+
+# 🔥 Evita errores comunes
+log_level = 2
+warn_on_root = 0
