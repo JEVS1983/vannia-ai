@@ -25,15 +25,16 @@ jobs:
           python3-pip git \
           libffi-dev libssl-dev \
           build-essential \
-          libsqlite3-dev zlib1g-dev
+          libsqlite3-dev zlib1g-dev \
+          wget
 
     - name: 📦 Install Buildozer
       run: |
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
 
-    # 🔥 SOLUCIÓN CLAVE REAL
-    - name: 🔓 Accept Android licenses (manual fix)
+    # 🔥 FIX 1: licencias
+    - name: 🔓 Accept licenses
       run: |
         mkdir -p ~/.android
         mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
@@ -43,12 +44,27 @@ jobs:
 
         touch ~/.android/repositories.cfg
 
-    # 🔧 PRIMER RUN (instala SDK completo)
+    # 🔥 FIX 2: crear sdkmanager donde Buildozer lo busca
+    - name: 🛠 Fix sdkmanager path
+      run: |
+        SDK=~/.buildozer/android/platform/android-sdk
+
+        mkdir -p $SDK/cmdline-tools
+        cd $SDK
+
+        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O tools.zip
+        unzip -q tools.zip -d cmdline-tools
+        mv cmdline-tools/cmdline-tools cmdline-tools/latest
+
+        mkdir -p $SDK/tools/bin
+        ln -s $SDK/cmdline-tools/latest/bin/sdkmanager $SDK/tools/bin/sdkmanager
+
+    # 🔧 primer run (descarga todo)
     - name: ⚙️ Initial setup
       run: |
         buildozer android debug || true
 
-    # 🚀 BUILD FINAL
+    # 🚀 build final
     - name: 📱 Build APK
       run: |
         buildozer android release
