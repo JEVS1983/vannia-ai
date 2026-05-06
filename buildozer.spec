@@ -2,49 +2,29 @@
 
 title = Vannia AI
 package.name = vanniaai
-package.domain = org.vannia
+package.domain = org.tuempresa
 
 source.dir = .
-source.include_exts = py,png,jpg,kv,atlas
+source.include_exts = py,png,jpg,kv
 
 version = 1.0
 
-# =========================
-# 🧠 PYTHON DEPENDENCIAS
-# =========================
 requirements = python3,kivy,pillow,gtts
 
-# =========================
-# 📱 ANDROID CONFIG ESTABLE
-# =========================
 orientation = portrait
 
-android.api = 34
+fullscreen = 0
+
+android.api = 33
 android.minapi = 21
+android.arch = arm64-v8a
+
+android.permissions = INTERNET
+
+android.sdk = 33
 android.ndk = 25b
+android.ndk_api = 21
 
-# 🔥 CLAVE: evitar SDK automático problemático
-android.sdk = 34
+android.accept_sdk_license = True
 
-# Arquitecturas Play Store
-android.archs = arm64-v8a, armeabi-v7a
-
-# Permisos básicos
-android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
-
-# Generar AAB (Play Store)
-android.release_artifact = aab
-
-# =========================
-# ⚙️ FIX IMPORTANTE CI/CD
-# =========================
-# Evita conflictos con versiones nuevas de SDK
-android.enable_androidx = True
-android.use_androidx = True
-
-# 🔥 IMPORTANTE: fuerza comportamiento estable
-p4a.branch = master
-
-# Logs más claros
 log_level = 2
-warn_on_root = 1
