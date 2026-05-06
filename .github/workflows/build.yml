@@ -1,4 +1,4 @@
-name: Build Vannia AI Android FIX FINAL
+name: Build Vannia AI Android FIX
 
 on:
   push:
@@ -10,7 +10,6 @@ jobs:
 
     env:
       ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
-      ANDROID_HOME: ${{ github.workspace }}/android-sdk
 
     steps:
     - name: Checkout
@@ -21,7 +20,7 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Install dependencies
+    - name: Install system deps
       run: |
         sudo apt update
         sudo apt install -y git zip unzip wget openjdk-17-jdk python3-pip
@@ -31,12 +30,12 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.36 python-for-android
 
-    - name: Clean build
+    - name: Clean project
       run: |
         rm -rf .buildozer
 
-    # 🔥 SDK TOOL CORRECTO
-    - name: Install Android SDK (NO 37)
+    # 🔥 SDK CORRECTO (NO 37)
+    - name: Install Android SDK
       run: |
         mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
         cd $ANDROID_SDK_ROOT
@@ -49,10 +48,10 @@ jobs:
 
         export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
 
-        # 🔥 FORZAR LICENCIAS SIN INTERACCIÓN
+        # 🔥 AUTO-ACCEPT LICENSES
         yes | sdkmanager --licenses || true
 
-        # 🔥 INSTALAR SDK ESTABLE (34)
+        # 🔥 SDK ESTABLE (NO 37)
         sdkmanager \
           "platform-tools" \
           "platforms;android-34" \
