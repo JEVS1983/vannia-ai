@@ -1,4 +1,4 @@
-name: Build Vannia AI Android STABLE
+name: Build Vannia AI Android FIX FINAL
 
 on:
   push:
@@ -10,6 +10,7 @@ jobs:
 
     env:
       ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
+      ANDROID_HOME: ${{ github.workspace }}/android-sdk
 
     steps:
     - name: Checkout
@@ -20,24 +21,22 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Install system dependencies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y git zip unzip wget openjdk-17-jdk python3-pip
 
-    - name: Install Buildozer + p4a
+    - name: Install Buildozer
       run: |
         pip install --upgrade pip
-        pip install buildozer cython==0.29.36
-        pip install python-for-android
+        pip install buildozer cython==0.29.36 python-for-android
 
-    # 🔥 LIMPIEZA SEGURA (NO BUILD ANDROID CLEAN)
-    - name: Clean only build cache
+    - name: Clean build
       run: |
         rm -rf .buildozer
 
-    # 🔥 INSTALL ANDROID SDK (MANUAL CONTROLADO)
-    - name: Install Android SDK
+    # 🔥 SDK TOOL CORRECTO
+    - name: Install Android SDK (NO 37)
       run: |
         mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
         cd $ANDROID_SDK_ROOT
@@ -50,14 +49,15 @@ jobs:
 
         export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
 
+        # 🔥 FORZAR LICENCIAS SIN INTERACCIÓN
         yes | sdkmanager --licenses || true
 
+        # 🔥 INSTALAR SDK ESTABLE (34)
         sdkmanager \
           "platform-tools" \
           "platforms;android-34" \
           "build-tools;34.0.0"
 
-    # 🔥 BUILD SIN CLEAN (CRÍTICO)
     - name: Build APK
       run: |
         buildozer android update
