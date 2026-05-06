@@ -1,4 +1,4 @@
-name: Build Vannia AI Android
+name: Build Vannia AI Android (FAST)
 
 on:
   push:
@@ -13,67 +13,76 @@ jobs:
       - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
+      - name: 🐍 Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: ⚙️ Install system dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y \
-            build-essential \
-            git \
-            zip unzip \
-            openjdk-17-jdk \
-            python3-pip \
-            libffi-dev \
-            libssl-dev
+      # 🔥 CACHE PRINCIPAL (CLAVE)
+      - name: ⚡ Cache buildozer + SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+            ~/.gradle
+            ~/.android
+            ~/android-sdk
+          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            buildozer-${{ runner.os }}-
 
-      - name: 📦 Install Python dependencies
+      - name: ⚙️ Dependencias mínimas (más rápido)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y openjdk-17-jdk zip unzip git
+
+      - name: 📦 Python deps
         run: |
           pip install --upgrade pip
           pip install buildozer cython
 
-      # 🔥 FIX CRÍTICO: instalar correctamente Android SDK + sdkmanager
-      - name: 📲 Setup Android SDK
+      # 🔥 SOLO instala SDK si NO existe (clave velocidad)
+      - name: 📲 Setup Android SDK (cached)
         run: |
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          cd $HOME/android-sdk
+          if [ ! -d "$HOME/android-sdk" ]; then
+            echo "Instalando SDK..."
+            mkdir -p $HOME/android-sdk/cmdline-tools
+            cd $HOME/android-sdk
 
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          unzip commandlinetools-linux-9477386_latest.zip
+            wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+            unzip commandlinetools-linux-9477386_latest.zip
 
-          mkdir -p cmdline-tools/latest
-          mv cmdline-tools/* cmdline-tools/latest/ || true
+            mkdir -p cmdline-tools/latest
+            mv cmdline-tools/* cmdline-tools/latest/ || true
+          else
+            echo "SDK cacheado 👍"
+          fi
 
           echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
           echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
 
-      # 🔥 FIX: aceptar licencias correctamente
-      - name: ✅ Accept licenses
+      - name: ✅ Licencias (rápido si cacheado)
         run: |
-          yes | sdkmanager --licenses
+          yes | sdkmanager --licenses || true
 
-      # 🔥 instalar componentes necesarios
-      - name: 📥 Install SDK components
+      - name: 📥 SDK components
         run: |
-          sdkmanager "platform-tools"
-          sdkmanager "platforms;android-33"
-          sdkmanager "build-tools;33.0.2"
+          sdkmanager "platform-tools" || true
+          sdkmanager "platforms;android-33" || true
+          sdkmanager "build-tools;33.0.2" || true
 
-      # 🔥 evitar bug de buildozer con tools/bin
-      - name: 🔧 Fix sdkmanager path (Buildozer bug)
+      # 🔥 FIX buildozer bug
+      - name: 🔧 Fix sdkmanager path
         run: |
           mkdir -p $HOME/android-sdk/tools/bin
-          ln -s $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/android-sdk/tools/bin/sdkmanager
+          ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/android-sdk/tools/bin/sdkmanager
 
-      - name: 🚀 Build APK / AAB
+      - name: 🚀 Build
         run: |
           buildozer android release
 
-      - name: 📤 Upload artifact
+      - name: 📤 Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vannia-ai-build
+          name: vannia-ai
           path: bin/*.aab
