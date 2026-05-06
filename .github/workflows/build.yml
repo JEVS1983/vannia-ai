@@ -2,69 +2,76 @@ name: Build Vannia AI Android
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-    - name: 📥 Checkout
+    - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: 🐍 Setup Python
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
 
-    - name: ⚙️ Install dependencies
+    - name: Install system dependencies
       run: |
         sudo apt update
         sudo apt install -y \
-          zip unzip openjdk-17-jdk \
-          python3-pip git \
-          libffi-dev libssl-dev \
           build-essential \
-          libsqlite3-dev zlib1g-dev \
-          wget
+          git \
+          zip \
+          unzip \
+          openjdk-17-jdk \
+          autoconf \
+          libtool \
+          pkg-config \
+          zlib1g-dev \
+          libncurses5-dev \
+          libffi-dev \
+          libssl-dev
 
-    - name: 📦 Install Buildozer
+    - name: Install Buildozer
       run: |
         pip install --upgrade pip
-        pip install buildozer cython==0.29.36
+        pip install buildozer cython
 
-    # 🔥 FIX 1: licencias
-    - name: 🔓 Accept licenses
+    # ✅ ANDROID SDK CORRECTO
+    - name: Install Android SDK (cmdline-tools)
       run: |
-        mkdir -p ~/.android
-        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+        mkdir -p android-sdk/cmdline-tools
+        cd android-sdk
 
-        echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "84831b9409646a918e30573bab4c9c91346d8abd" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+        unzip commandlinetools-linux-*.zip
 
-        touch ~/.android/repositories.cfg
+        mv cmdline-tools cmdline-tools/latest
 
-    # 🔥 FIX 2: crear sdkmanager donde Buildozer lo busca
-    - name: 🛠 Fix sdkmanager path
+    - name: Setup Android environment
       run: |
-        SDK=~/.buildozer/android/platform/android-sdk
+        echo "ANDROID_SDK_ROOT=$PWD/android-sdk" >> $GITHUB_ENV
+        echo "ANDROID_HOME=$PWD/android-sdk" >> $GITHUB_ENV
+        echo "PATH=$PWD/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=$PWD/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
 
-        mkdir -p $SDK/cmdline-tools
-        cd $SDK
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O tools.zip
-        unzip -q tools.zip -d cmdline-tools
-        mv cmdline-tools/cmdline-tools cmdline-tools/latest
-
-        mkdir -p $SDK/tools/bin
-        ln -s $SDK/cmdline-tools/latest/bin/sdkmanager $SDK/tools/bin/sdkmanager
-
-    # 🔧 primer run (descarga todo)
-    - name: ⚙️ Initial setup
+    # ✅ LICENCIAS (CRÍTICO)
+    - name: Accept Android licenses
       run: |
-        buildozer android debug || true
+        yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
-    # 🚀 build final
-    - name: 📱 Build APK
+    # ✅ INSTALAR COMPONENTES
+    - name: Install SDK packages
+      run: |
+        android-sdk/cmdline-tools/latest/bin/sdkmanager \
+          "platform-tools" \
+          "platforms;android-33" \
+          "build-tools;33.0.2" \
+          "ndk;25.2.9519653"
+
+    # ✅ BUILD
+    - name: Build APK / AAB
       run: |
         buildozer android release
