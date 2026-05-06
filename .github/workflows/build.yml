@@ -10,6 +10,7 @@ jobs:
 
     env:
       ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
+      ANDROID_HOME: ${{ github.workspace }}/android-sdk
 
     steps:
     - name: Checkout
@@ -20,7 +21,7 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Install system dependencies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y git zip unzip openjdk-17-jdk python3-pip
@@ -30,19 +31,25 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
 
-    - name: Prevent SDK license blocking
+    # 🔥 CLAVE: aceptar TODAS las licencias antes de instalar
+    - name: Setup Android SDK clean
       run: |
-        mkdir -p $HOME/.android
-        touch $HOME/.android/repositories.cfg
+        mkdir -p $ANDROID_SDK_ROOT
+        yes | sdkmanager --licenses || true
 
-    # 🔥 CLAVE: fijar SDK estable
-    - name: Install Android SDK (stable)
+    - name: Install stable SDK (NO 37)
       run: |
         yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT \
           "platform-tools" \
           "platforms;android-34" \
-          "build-tools;34.0.0" || true
+          "build-tools;34.0.0"
+
+    - name: Lock environment
+      run: |
+        echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+        echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
 
     - name: Build APK/AAB
       run: |
+        buildozer android clean
         buildozer -v android release
