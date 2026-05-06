@@ -6,72 +6,51 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout repo
+    - name: Checkout
       uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: 3.10
 
-    - name: Install system dependencies
+    - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y \
-          build-essential \
-          git \
-          zip \
-          unzip \
-          openjdk-17-jdk \
-          autoconf \
-          libtool \
-          pkg-config \
-          zlib1g-dev \
-          libncurses5-dev \
-          libffi-dev \
-          libssl-dev
-
-    - name: Install Buildozer
-      run: |
+        sudo apt install -y zip unzip openjdk-17-jdk python3-pip build-essential git
         pip install --upgrade pip
         pip install buildozer cython
 
-    # ✅ ANDROID SDK CORRECTO
-    - name: Install Android SDK (cmdline-tools)
+    # 🔥 ANDROID SDK CORRECTO
+    - name: Install Android SDK
       run: |
         mkdir -p android-sdk/cmdline-tools
-        cd android-sdk
 
         wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-        unzip commandlinetools-linux-*.zip
+        unzip commandlinetools-linux-9477386_latest.zip -d android-sdk/cmdline-tools
 
-        mv cmdline-tools cmdline-tools/latest
+        mv android-sdk/cmdline-tools/cmdline-tools android-sdk/cmdline-tools/latest
 
-    - name: Setup Android environment
+    - name: Set Android environment
       run: |
-        echo "ANDROID_SDK_ROOT=$PWD/android-sdk" >> $GITHUB_ENV
-        echo "ANDROID_HOME=$PWD/android-sdk" >> $GITHUB_ENV
-        echo "PATH=$PWD/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
-        echo "PATH=$PWD/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=$GITHUB_WORKSPACE/android-sdk" >> $GITHUB_ENV
+        echo "ANDROID_HOME=$GITHUB_WORKSPACE/android-sdk" >> $GITHUB_ENV
+        echo "PATH=$GITHUB_WORKSPACE/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=$GITHUB_WORKSPACE/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
 
-    # ✅ LICENCIAS (CRÍTICO)
-    - name: Accept Android licenses
+    # 🔥 ACEPTAR LICENCIAS AUTOMÁTICAMENTE
+    - name: Accept licenses and install SDK packages
       run: |
-        yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+        yes | sdkmanager --licenses
 
-    # ✅ INSTALAR COMPONENTES
-    - name: Install SDK packages
-      run: |
-        android-sdk/cmdline-tools/latest/bin/sdkmanager \
-          "platform-tools" \
-          "platforms;android-33" \
-          "build-tools;33.0.2" \
-          "ndk;25.2.9519653"
+        sdkmanager "platform-tools" \
+                   "platforms;android-33" \
+                   "build-tools;33.0.2"
 
-    # ✅ BUILD
+    # 🔥 BUILD
     - name: Build APK / AAB
       run: |
         buildozer android release
