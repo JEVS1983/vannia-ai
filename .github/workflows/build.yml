@@ -1,82 +1,80 @@
 name: Build Android
 
 on:
-push:
-branches:
-- main
-workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-build:
-runs-on: ubuntu-22.04
+  build:
+    runs-on: ubuntu-22.04
 
-```
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  # Python correcto
-  - name: Setup Python
-    uses: actions/setup-python@v4
-    with:
-      python-version: "3.10"
+      # Python correcto
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-  # Java
-  - name: Setup Java
-    uses: actions/setup-java@v4
-    with:
-      distribution: "temurin"
-      java-version: "17"
+      # Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
 
-  # Cache
-  - name: Cache Buildozer
-    uses: actions/cache@v3
-    with:
-      path: |
-        ~/.buildozer
-        .buildozer
-      key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+      # Cache
+      - name: Cache Buildozer
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.buildozer
+            .buildozer
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
 
-  # Dependencias
-  - name: Install dependencies
-    run: |
-      sudo apt-get update
+      # Dependencias
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            libffi-dev \
+            libssl-dev \
+            python3-pip
 
-      sudo apt-get install -y \
-        build-essential \
-        git \
-        zip \
-        unzip \
-        libffi-dev \
-        libssl-dev \
-        python3-pip
+          pip install --upgrade pip
+          pip install cython buildozer
 
-      pip install --upgrade pip
-      pip install cython buildozer
+      # Licencias Android
+      - name: Accept Android licenses
+        run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
 
-  # 🔥 PRECREAR LICENCIAS DE ANDROID
-  - name: Accept Android licenses
-    run: |
-      mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
 
-      echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-      echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
 
-  # 🔥 Variables críticas
-  - name: Set Android env
-    run: |
-      echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-      echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+      # Variables Android
+      - name: Set Android env
+        run: |
+          echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
 
-  # Build
-  - name: Build APK
-    run: |
-      buildozer android release
+      # Build APK
+      - name: Build APK
+        run: |
+          buildozer android release
 
-  # Artifact
-  - name: Upload APK
-    uses: actions/upload-artifact@v4
-    with:
-      name: android-build
-      path: bin/*
-```
+      # Upload artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: bin/*
