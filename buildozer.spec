@@ -87,10 +87,8 @@ copy_libs = 1
 
 presplash.color = #000000
 
-# Cuando tengas icon.png en la raíz:
+# Icon and presplash (create icon.png in root if needed)
 # icon.filename = icon.png
-
-# Cuando tengas presplash.png:
 # presplash.filename = presplash.png
 
 # -------------------------------------------------
