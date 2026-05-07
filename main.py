@@ -1,15 +1,13 @@
 # ==========================================================
-# 🚀 VANNIA AI - STABLE ANDROID VERSION
+# 🚀 VANNIA AI - ANDROID STABLE BUILD
 # ==========================================================
 
 import os
 import json
-import uuid
 import threading
 import webbrowser
 
 from datetime import datetime
-from PIL import Image, ImageDraw
 
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -43,9 +41,12 @@ BANNED = [
 # ==========================================================
 
 def safe(text):
+
     for w in BANNED:
+
         if w in text.lower():
             return "historia creativa positiva"
+
     return text
 
 # ==========================================================
@@ -55,6 +56,7 @@ def safe(text):
 class DB:
 
     def __init__(self):
+
         self.data = self.load()
 
     def load(self):
@@ -72,10 +74,12 @@ class DB:
             return data
 
         try:
+
             with open(DB_FILE, "r") as f:
                 return json.load(f)
 
         except:
+
             return {
                 "credits": FREE_DAILY,
                 "premium": False,
@@ -85,7 +89,12 @@ class DB:
     def save(self, data=None):
 
         with open(DB_FILE, "w") as f:
-            json.dump(data or self.data, f, indent=2)
+
+            json.dump(
+                data or self.data,
+                f,
+                indent=2
+            )
 
 # ==========================================================
 # AI ENGINE
@@ -105,21 +114,8 @@ class AI:
 
     def image(self, text):
 
-        img = Image.new("RGB", (512, 512), (30, 30, 30))
-
-        draw = ImageDraw.Draw(img)
-
-        draw.text(
-            (40, 240),
-            text[:40],
-            fill=(255, 255, 255)
-        )
-
-        path = f"{BASE}/{uuid.uuid4().hex}.png"
-
-        img.save(path)
-
-        return path
+        # Simulación estable Android
+        return "ok"
 
 # ==========================================================
 # ENGINE
@@ -133,10 +129,8 @@ class Engine:
 
         script = ai.script(topic)
 
-        imgs = []
-
-        for s in script:
-            imgs.append(ai.image(s))
+        # Simulación temporal estable
+        imgs = script
 
         return imgs
 
@@ -185,7 +179,9 @@ class Ads:
     def reward(self, monet):
 
         if platform != "android":
+
             monet.reward()
+
             return
 
         print("Rewarded Ad placeholder")
@@ -199,7 +195,9 @@ class Billing:
     def premium(self, monet):
 
         if platform != "android":
+
             monet.premium()
+
             return
 
         print("Premium placeholder")
@@ -231,6 +229,7 @@ class MercadoPago:
         }
 
         if pack in links:
+
             webbrowser.open(links[pack])
 
 # ==========================================================
@@ -306,6 +305,7 @@ class VanniaApp(App):
         ]
 
         for w in widgets:
+
             layout.add_widget(w)
 
         return layout
@@ -378,4 +378,5 @@ class VanniaApp(App):
 # ==========================================================
 
 if __name__ == "__main__":
+
     VanniaApp().run()
