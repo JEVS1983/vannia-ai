@@ -1,133 +1,24 @@
 [app]
-
-# ==========================================================
-# BASIC
-# ==========================================================
-
-title = Vannia AI
-
+title = VanniaAI
 package.name = vanniaai
-
-package.domain = org.vannia.ai
+package.domain = org.vannia
 
 source.dir = .
-
-source.include_exts = py,png,jpg,jpeg,kv,json,txt
+source.include_exts = py,png,jpg,kv
 
 version = 1.0
 
-# ==========================================================
-# REQUIREMENTS
-# ==========================================================
-
-requirements = python3,kivy,requests,plyer
-
-# ==========================================================
-# ORIENTATION
-# ==========================================================
+requirements = python3,kivy,requests
 
 orientation = portrait
 
-fullscreen = 0
+android.permissions = INTERNET
 
-# ==========================================================
-# ICONS / SPLASH
-# ==========================================================
-
-icon.filename = icon.png
-
-presplash.filename = presplash.png
-
-android.presplash_color = #111111
-
-# ==========================================================
-# ANDROID SDK
-# ==========================================================
-
-android.api = 34
-
+android.api = 33
 android.minapi = 24
 
-android.ndk = 25b
+android.archs = arm64-v8a,armeabi-v7a
 
-android.archs = arm64-v8a, armeabi-v7a
-
-android.accept_sdk_license = True
-
-android.enable_androidx = True
-
-android.allow_backup = True
-
-# ==========================================================
-# ANDROID PERMISSIONS
-# ==========================================================
-
-android.permissions = INTERNET,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
-
-# ==========================================================
-# P4A
-# ==========================================================
-
-p4a.bootstrap = sdl2
-
-p4a.branch = master
-
-# ==========================================================
-# ENTRYPOINT
-# ==========================================================
-
-android.entrypoint = org.kivy.android.PythonActivity
-
-# ==========================================================
-# BUILD PATHS
-# ==========================================================
-
-build_dir = .buildozer
-
-bin_dir = ./bin
-
-# ==========================================================
-# LOGS
-# ==========================================================
-
+[buildozer]
 log_level = 2
-
 warn_on_root = 1
-
-# ==========================================================
-# EXCLUDES
-# ==========================================================
-
-source.exclude_dirs = tests, venv, .git, bin
-
-source.exclude_patterns = *.psd,*.zip,*.rar
-
-# ==========================================================
-# PYTHON / OSX
-# ==========================================================
-
-osx.python_version = 3
-
-osx.kivy_version = 2.3.0
-
-# ==========================================================
-# GRADLE
-# ==========================================================
-
-android.gradle_dependencies =
-
-# ==========================================================
-# SERVICES
-# ==========================================================
-
-services =
-
-# ==========================================================
-# RELEASE
-# ==========================================================
-
-# android.release_artifact = aab
-
-# ==========================================================
-# END
-# ==========================================================
