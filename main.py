@@ -1,5 +1,5 @@
 # ==========================================================
-# 🚀 VANNIA AI - ANDROID STABLE BUILD
+# 🚀 VANNIA AI - ANDROID STABLE UI
 # ==========================================================
 
 import os
@@ -252,38 +252,64 @@ class VanniaApp(App):
 
         self.mp = MercadoPago()
 
+        # ==================================================
+        # LAYOUT
+        # ==================================================
+
         layout = BoxLayout(
             orientation="vertical",
-            spacing=10,
-            padding=10
+            spacing=15,
+            padding=15
         )
 
+        # ==================================================
+        # INPUT
+        # ==================================================
+
         self.input = TextInput(
-            hint_text="Escribe idea",
+            hint_text="Escribe una idea",
             multiline=False,
-            size_hint=(1, 0.2)
+            size_hint=(1, 0.15),
+            font_size=24
         )
+
+        # ==================================================
+        # STATUS
+        # ==================================================
 
         self.status = Label(
             text="Listo",
-            size_hint=(1, 0.2)
+            size_hint=(1, 0.12),
+            font_size=28
         )
 
+        # ==================================================
+        # BUTTONS
+        # ==================================================
+
         btn_gen = Button(
-            text="🎬 Generar"
+            text="Generar",
+            font_size=24
         )
 
         btn_ad = Button(
-            text="📺 Anuncio"
+            text="Anuncio",
+            font_size=24
         )
 
         btn_premium = Button(
-            text="💎 Premium"
+            text="Premium",
+            font_size=24
         )
 
         btn_mp = Button(
-            text="💳 Mercado Pago"
+            text="Mercado Pago",
+            font_size=24
         )
+
+        # ==================================================
+        # EVENTS
+        # ==================================================
 
         btn_gen.bind(on_press=self.generate)
 
@@ -294,6 +320,10 @@ class VanniaApp(App):
         btn_mp.bind(
             on_press=lambda x: self.mp.buy("10")
         )
+
+        # ==================================================
+        # ADD WIDGETS
+        # ==================================================
 
         widgets = [
             self.input,
@@ -347,7 +377,7 @@ class VanniaApp(App):
 
     def done_success(self):
 
-        self.status.text = "Listo ✔"
+        self.status.text = "Listo"
 
     def done_error(self, error):
 
