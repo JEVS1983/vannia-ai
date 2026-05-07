@@ -1,79 +1,89 @@
 [app]
 
-# (str) Title of your application
+# ---------------------------------------
+# APP INFO
+# ---------------------------------------
+
 title = Vannia AI
-
-# (str) Package name
 package.name = vanniaai
-
-# (str) Package domain
 package.domain = org.vannia.ai
 
-# (str) Source code where the main.py lives
+# ---------------------------------------
+# SOURCE
+# ---------------------------------------
+
 source.dir = .
-
-# (list) Source files to include
 source.include_exts = py,png,jpg,jpeg,kv,json,txt
-
-# (list) List of inclusions using pattern matching
 source.include_patterns = assets/*,images/*
 
-# (str) Application version
+# Main file
+source.main = main.py
+
+# ---------------------------------------
+# VERSION
+# ---------------------------------------
+
 version = 1.0
 
-# (list) Application requirements
+# ---------------------------------------
+# REQUIREMENTS
+# ---------------------------------------
+
 requirements = python3,kivy
 
-# (str) Supported orientation
-orientation = portrait
+# ---------------------------------------
+# DISPLAY
+# ---------------------------------------
 
-# (bool) Fullscreen
+orientation = portrait
 fullscreen = 0
 
-# Android API
+# ---------------------------------------
+# ANDROID
+# ---------------------------------------
+
 android.api = 33
-
-# Minimum API
 android.minapi = 21
-
-# Android NDK version
 android.ndk = 25b
+
+# Architectures
+android.archs = arm64-v8a, armeabi-v7a
 
 # Permissions
 android.permissions = INTERNET
 
-# Presplash background color
-presplash.color = #000000
-
-# App icon
-icon.filename = icon.png
-
-# (int) Log level
-log_level = 2
-
-# (int) Warn on root
-warn_on_root = 1
-
-# Build mode
-p4a.branch = master
-
-# Android architecture
-android.archs = arm64-v8a, armeabi-v7a
-
-# Enable AndroidX
+# AndroidX
 android.enable_androidx = True
 
-# Kivy version bootstrap
+# Bootstrap
 p4a.bootstrap = sdl2
 
-# Recommended Gradle options
-android.gradle_dependencies =
+# ---------------------------------------
+# BUILD
+# ---------------------------------------
 
-# Disable byte compile
-android.copy_libs = 1
+p4a.branch = master
 
-# Debug
 build_dir = .buildozer
 
-# Entry point
-source.main = main.py
+copy_libs = 1
+
+# ---------------------------------------
+# UI
+# ---------------------------------------
+
+presplash.color = #000000
+
+# IMPORTANTE:
+# Desactivado porque el archivo no existe
+# Si luego agregas icon.png en la raíz,
+# puedes descomentar esta línea.
+
+# icon.filename = icon.png
+
+# ---------------------------------------
+# DEBUG
+# ---------------------------------------
+
+log_level = 2
+warn_on_root = 1
