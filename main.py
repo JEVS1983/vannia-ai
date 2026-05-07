@@ -1,12 +1,13 @@
 # ==========================================================
-# 🚀 VANNIA AI - NEXT GENERATION
-# Android Stable + Images + History + Projects
+# 🚀 VANNIA AI + GEMINI
+# Android Stable + IA Real
 # ==========================================================
 
 import os
 import json
 import threading
 import webbrowser
+import requests
 
 from datetime import datetime
 
@@ -34,6 +35,12 @@ try:
 except:
 
     FILECHOOSER = False
+
+# ==========================================================
+# GEMINI API KEY
+# ==========================================================
+
+API_KEY = os.getenv("GEMINI_API_KEY")
 
 # ==========================================================
 # CONFIG
@@ -154,7 +161,7 @@ class History:
             json.dump(data, f, indent=2)
 
 # ==========================================================
-# AI ENGINE
+# GEMINI AI ENGINE
 # ==========================================================
 
 class AI:
@@ -163,15 +170,73 @@ class AI:
 
         topic = safe(topic)
 
-        return [
-            f"🎥 IDEA: {topic}",
-            "",
-            f"Nadie esperaba esto sobre {topic}.",
-            "",
-            "El mundo cambia de forma inesperada.",
-            "",
-            "Todo terminó con un final sorprendente."
-        ]
+        if not API_KEY:
+
+            return [
+                "ERROR:",
+                "",
+                "No se encontró GEMINI_API_KEY"
+            ]
+
+        try:
+
+            url = (
+                "https://generativelanguage.googleapis.com/"
+                "v1beta/models/gemini-1.5-flash:generateContent"
+            )
+
+            headers = {
+                "Content-Type": "application/json"
+            }
+
+            prompt = f"""
+            Genera una historia creativa corta sobre:
+
+            {topic}
+
+            Requisitos:
+            - en español
+            - estilo TikTok
+            - emocionante
+            - breve
+            - moderna
+            """
+
+            data = {
+                "contents": [
+                    {
+                        "parts": [
+                            {
+                                "text": prompt
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            response = requests.post(
+                f"{url}?key={API_KEY}",
+                headers=headers,
+                json=data,
+                timeout=30
+            )
+
+            result = response.json()
+
+            text = (
+                result["candidates"][0]
+                ["content"]["parts"][0]["text"]
+            )
+
+            return text.split("\n")
+
+        except Exception as e:
+
+            return [
+                "ERROR GEMINI",
+                "",
+                str(e)
+            ]
 
 # ==========================================================
 # ENGINE
@@ -323,7 +388,7 @@ class VanniaApp(App):
         # ==================================================
 
         self.preview = Image(
-            size_hint=(1, 0.3),
+            size_hint=(1, 0.25),
             allow_stretch=True
         )
 
@@ -332,7 +397,7 @@ class VanniaApp(App):
         # ==================================================
 
         self.result = Label(
-            text="Aquí aparecerá el contenido generado",
+            text="Aquí aparecerá la respuesta IA",
             font_size=22,
             size_hint_y=None,
             halign="left",
@@ -356,7 +421,7 @@ class VanniaApp(App):
         )
 
         scroll = ScrollView(
-            size_hint=(1, 0.4)
+            size_hint=(1, 0.35)
         )
 
         scroll.add_widget(self.result)
@@ -366,7 +431,7 @@ class VanniaApp(App):
         # ==================================================
 
         btn_gen = Button(
-            text="Generar",
+            text="Generar IA",
             font_size=22
         )
 
@@ -438,7 +503,7 @@ class VanniaApp(App):
 
             return
 
-        self.status.text = "Generando..."
+        self.status.text = "Consultando Gemini..."
 
         threading.Thread(
             target=self.run_generation,
@@ -474,7 +539,7 @@ class VanniaApp(App):
 
         self.result.text = text
 
-        self.status.text = "Generación completada"
+        self.status.text = "Respuesta generada"
 
     def done_error(self, error):
 
