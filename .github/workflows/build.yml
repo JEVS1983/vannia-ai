@@ -22,10 +22,10 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
+          distribution: temurin
           java-version: "17"
 
-      - name: Install system dependencies
+      - name: Install Linux dependencies
         run: |
           sudo apt-get update
 
@@ -33,17 +33,18 @@ jobs:
             git zip unzip openjdk-17-jdk \
             python3-pip autoconf libtool pkg-config \
             zlib1g-dev libncurses5-dev libncursesw5-dev \
-            cmake libffi-dev libssl-dev build-essential \
-            wget curl tar
+            cmake libffi-dev libssl-dev \
+            build-essential wget curl tar
 
           pip install --upgrade pip
           pip install buildozer cython==0.29.33
 
-      # Install Android SDK cmdline-tools
-      - name: Install Android cmdline-tools
+      # Prepare Buildozer Android SDK folder
+      - name: Prepare Android SDK
         run: |
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          cd $HOME/android-sdk
+          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools
+
+          cd ~/.buildozer/android/platform/android-sdk
 
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O tools.zip
 
@@ -55,33 +56,30 @@ jobs:
 
           mv latest-temp cmdline-tools/latest
 
-          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          mkdir -p tools/bin
+
+          ln -s \
+            ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+            ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+
+      # Android environment
+      - name: Set Android environment
+        run: |
+          echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
 
       # Accept licenses
-      - name: Accept licenses
+      - name: Accept Android licenses
         run: |
-          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      # Install SDK packages
-      - name: Install SDK packages
+      # Install Android packages
+      - name: Install Android packages
         run: |
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+          ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
             "platform-tools" \
             "platforms;android-33" \
             "build-tools;33.0.2"
-
-      # CRITICAL FIX FOR BUILDOZER
-      - name: Fix sdkmanager path for Buildozer
-        run: |
-          mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
-
-          cp \
-            $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager \
-            ~/.buildozer/android/platform/android-sdk/tools/bin/
-
-          chmod +x \
-            ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
       # Build APK
       - name: Build APK
