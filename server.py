@@ -1,37 +1,78 @@
 from flask import Flask, request, jsonify
 import requests
+import os
 
 app = Flask(__name__)
 
-GEMINI_API_KEY = "TU_API_KEY_AQUI"
+# =========================
+# API KEY GEMINI
+# =========================
+# En Render debes crear:
+# GEMINI_API_KEY = tu_api_key
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# =========================
+# URL GEMINI
+# =========================
 GEMINI_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
     f"gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 )
 
+# =========================
+# RUTA PRINCIPAL
+# =========================
+@app.route("/")
+def home():
+    return "Vannia AI Backend Online"
 
+# =========================
+# CHAT
+# =========================
 @app.route("/chat", methods=["POST"])
 def chat():
+
     try:
-        text = request.json.get("text", "")
+
+        data = request.get_json()
+
+        text = data.get("text", "")
 
         payload = {
             "contents": [
-                {"parts": [{"text": text}]}
+                {
+                    "parts": [
+                        {"text": text}
+                    ]
+                }
             ]
         }
 
-        r = requests.post(GEMINI_URL, json=payload, timeout=20)
-        data = r.json()
+        r = requests.post(
+            GEMINI_URL,
+            json=payload,
+            timeout=30
+        )
 
-        reply = data["candidates"][0]["content"]["parts"][0]["text"]
+        result = r.json()
 
-        return jsonify({"reply": reply})
+        print(result)
+
+        reply = result["candidates"][0]["content"]["parts"][0]["text"]
+
+        return jsonify({
+            "reply": reply
+        })
 
     except Exception as e:
-        return jsonify({"error": str(e)})
 
+        return jsonify({
+            "error": str(e)
+        })
 
+# =========================
+# RUN
+# =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
