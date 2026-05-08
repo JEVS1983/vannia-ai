@@ -8,28 +8,26 @@ source.include_exts = py,png,jpg,kv
 
 version = 1.0
 
-# 🔥 Dependencias seguras para Android (sin crashes)
+# 🔥 Dependencias seguras (evita crashes Android)
 requirements = python3,kivy,requests
 
 orientation = portrait
 
-# 🌐 Internet necesario para Gemini
+# 🌐 Permiso esencial para Gemini API
 android.permissions = INTERNET
 
-# 📱 Compatibilidad moderna (clave para tu error de instalación)
+# 📱 Compatibilidad REAL con Android actual
 android.api = 33
 android.minapi = 24
-
-# ⚙️ Arquitecturas correctas (evita fallos de instalación)
-android.archs = arm64-v8a,armeabi-v7a
-
-# 🧠 Optimización / estabilidad
-android.ndk = 25b
 android.ndk_api = 21
 
-# 🧱 Evita builds raros o incompatibles
+# ⚙️ Arquitectura estable (evita errores de instalación)
+android.archs = arm64-v8a
+
+# 🧠 Estabilidad de compilación
+android.ndk = 25b
 log_level = 2
 warn_on_root = 1
 
-# 🚫 Reduce errores de empaquetado
+# 🚫 Evita problemas visuales raros
 fullscreen = 0
