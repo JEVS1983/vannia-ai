@@ -4,13 +4,13 @@ import os
 
 app = Flask(__name__)
 
-# API KEY desde Render Environment Variables
+# API KEY desde Render
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Modelo Gemini corregido
+# URL correcta Gemini
 GEMINI_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
-    f"gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    f"gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 )
 
 
@@ -26,14 +26,14 @@ def chat():
 
         if not data:
             return jsonify({
-                "reply": "No se recibieron datos"
+                "reply": "No data received"
             })
 
-        text = data.get("text", "")
+        text = data.get("text", "").strip()
 
-        if text.strip() == "":
+        if not text:
             return jsonify({
-                "reply": "Mensaje vacío"
+                "reply": "Empty message"
             })
 
         payload = {
@@ -63,10 +63,16 @@ def chat():
 
         print(result)
 
-        # Validación segura
+        # Manejo de errores Gemini
+        if "error" in result:
+            return jsonify({
+                "reply": f"Error Gemini: {result['error']['message']}"
+            })
+
+        # Validar candidates
         if "candidates" not in result:
             return jsonify({
-                "reply": f"Error Gemini: {result}"
+                "reply": f"Unexpected response: {result}"
             })
 
         reply = (
