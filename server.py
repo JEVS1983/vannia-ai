@@ -4,32 +4,31 @@ import os
 
 app = Flask(__name__)
 
-# =========================
-# API KEY GEMINI
-# =========================
-# En Render debes crear:
-# GEMINI_API_KEY = tu_api_key
-
+# =====================================
+# API KEY
+# =====================================
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# =========================
+# =====================================
 # URL GEMINI
-# =========================
+# =====================================
 GEMINI_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
     f"gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 )
 
-# =========================
-# RUTA PRINCIPAL
-# =========================
+# =====================================
+# HOME
+# =====================================
 @app.route("/")
 def home():
+
     return "Vannia AI Backend Online"
 
-# =========================
+
+# =====================================
 # CHAT
-# =========================
+# =====================================
 @app.route("/chat", methods=["POST"])
 def chat():
 
@@ -43,7 +42,9 @@ def chat():
             "contents": [
                 {
                     "parts": [
-                        {"text": text}
+                        {
+                            "text": text
+                        }
                     ]
                 }
             ]
@@ -59,6 +60,18 @@ def chat():
 
         print(result)
 
+        # =====================================
+        # VALIDAR ERROR GEMINI
+        # =====================================
+        if "candidates" not in result:
+
+            return jsonify({
+                "error": str(result)
+            })
+
+        # =====================================
+        # RESPUESTA
+        # =====================================
         reply = result["candidates"][0]["content"]["parts"][0]["text"]
 
         return jsonify({
@@ -71,8 +84,10 @@ def chat():
             "error": str(e)
         })
 
-# =========================
+
+# =====================================
 # RUN
-# =========================
+# =====================================
 if __name__ == "__main__":
+
     app.run(host="0.0.0.0", port=5000)
