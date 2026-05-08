@@ -14,19 +14,27 @@ from kivy.clock import Clock
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # =========================
-# URL DE TU BACKEND
+# URL DEL BACKEND
+# ⚠️ CAMBIA ESTO POR TU URL REAL
 # =========================
 SERVER_URL = "https://TU-SERVIDOR.onrender.com/chat"
 
 # =========================
-# UI PRINCIPAL
+# INTERFAZ PRINCIPAL
 # =========================
 class VanniaLayout(BoxLayout):
 
     def __init__(self, **kwargs):
-        super().__init__(orientation="vertical", padding=10, spacing=10, **kwargs)
+        super().__init__(
+            orientation="vertical",
+            padding=10,
+            spacing=10,
+            **kwargs
+        )
 
-        # Área de respuesta
+        # =========================
+        # ÁREA RESPUESTA
+        # =========================
         self.output = Label(
             text="Hola, soy Vannia AI ✨",
             size_hint_y=0.8,
@@ -36,14 +44,18 @@ class VanniaLayout(BoxLayout):
 
         self.output.bind(size=self.update_text_width)
 
-        # Input
+        # =========================
+        # INPUT
+        # =========================
         self.input = TextInput(
             hint_text="Escribe tu mensaje...",
             multiline=False,
             size_hint_y=0.1
         )
 
-        # Botón enviar
+        # =========================
+        # BOTÓN
+        # =========================
         self.send_button = Button(
             text="Enviar",
             size_hint_y=0.1
@@ -51,13 +63,15 @@ class VanniaLayout(BoxLayout):
 
         self.send_button.bind(on_press=self.send_message)
 
-        # Agregar widgets
+        # =========================
+        # AGREGAR WIDGETS
+        # =========================
         self.add_widget(self.output)
         self.add_widget(self.input)
         self.add_widget(self.send_button)
 
     # =========================
-    # AJUSTAR TEXTO
+    # AJUSTAR TEXTO LABEL
     # =========================
     def update_text_width(self, *args):
         self.output.text_size = (self.output.width, None)
@@ -74,11 +88,14 @@ class VanniaLayout(BoxLayout):
 
         self.output.text = "Pensando..."
 
-        # Ejecutar sin congelar UI
-        Clock.schedule_once(lambda dt: self.ask_gemini(mensaje), 0)
+        # Ejecutar sin congelar interfaz
+        Clock.schedule_once(
+            lambda dt: self.ask_gemini(mensaje),
+            0
+        )
 
     # =========================
-    # CONECTAR BACKEND
+    # CONSULTAR BACKEND
     # =========================
     def ask_gemini(self, mensaje):
 
@@ -91,14 +108,24 @@ class VanniaLayout(BoxLayout):
                 timeout=30
             )
 
-            data = response.json()
+            # Ver respuesta real del servidor
+            print(response.text)
 
-            if "reply" in data:
-                self.output.text = data["reply"]
-            else:
-                self.output.text = "Error: respuesta inválida."
+            try:
+
+                data = response.json()
+
+                if "reply" in data:
+                    self.output.text = data["reply"]
+
+                else:
+                    self.output.text = str(data)
+
+            except Exception:
+                self.output.text = response.text
 
         except Exception as e:
+
             self.output.text = f"Error:\n{str(e)}"
 
 # =========================
