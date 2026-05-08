@@ -1,5 +1,5 @@
 [app]
-title = VanniaAI
+title = Vannia AI
 package.name = vanniaai
 package.domain = org.vannia
 
@@ -8,25 +8,20 @@ source.include_exts = py,png,jpg,kv
 
 version = 1.0
 
-requirements = python3,kivy,requests
+requirements = python3,kivy,requests,plyer,pillow
 
 orientation = portrait
 
 android.permissions = INTERNET
 
-# 🔥 Compatibilidad real Android moderno
 android.api = 33
-android.minapi = 24
-android.ndk_api = 21
-
-# ⚙️ arquitectura segura
-android.archs = arm64-v8a
-
+android.minapi = 21
 android.ndk = 25b
 
-# 🔥 clave para evitar tu error de mismatch
-android.allow_minsdk_ndkapi_mismatch = True
+android.archs = arm64-v8a
 
+android.allow_minapi_mismatch = True
+
+[buildozer]
 log_level = 2
 warn_on_root = 1
-fullscreen = 0
