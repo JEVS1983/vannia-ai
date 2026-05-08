@@ -8,34 +8,37 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.clock import Clock
 
-# =========================
+
+# =====================================
 # DESACTIVAR WARNING SSL
-# =========================
+# =====================================
 urllib3.disable_warnings(
     urllib3.exceptions.InsecureRequestWarning
 )
 
-# =========================
-# URL DEL BACKEND
-# ⚠️ CAMBIA ESTO
-# =========================
-SERVER_URL = "https://TU-APP.onrender.com/chat"
+# =====================================
+# URL DE TU BACKEND RENDER
+# =====================================
+SERVER_URL = "https://vannia-ai.onrender.com/chat"
 
-# =========================
-# UI
-# =========================
+
+# =====================================
+# LAYOUT PRINCIPAL
+# =====================================
 class VanniaLayout(BoxLayout):
 
     def __init__(self, **kwargs):
 
         super().__init__(
             orientation="vertical",
-            padding=10,
-            spacing=10,
+            padding=15,
+            spacing=15,
             **kwargs
         )
 
-        # RESPUESTA
+        # =========================
+        # RESPUESTA IA
+        # =========================
         self.output = Label(
             text="Hola, soy Vannia AI ✨",
             size_hint_y=0.8,
@@ -47,14 +50,18 @@ class VanniaLayout(BoxLayout):
             size=self.update_text_width
         )
 
-        # INPUT
+        # =========================
+        # INPUT USUARIO
+        # =========================
         self.input = TextInput(
-            hint_text="Escribe tu mensaje...",
+            hint_text="Escribe un mensaje...",
             multiline=False,
             size_hint_y=0.1
         )
 
-        # BOTÓN
+        # =========================
+        # BOTÓN ENVIAR
+        # =========================
         self.send_button = Button(
             text="Enviar",
             size_hint_y=0.1
@@ -64,14 +71,16 @@ class VanniaLayout(BoxLayout):
             on_press=self.send_message
         )
 
-        # WIDGETS
+        # =========================
+        # AGREGAR WIDGETS
+        # =========================
         self.add_widget(self.output)
         self.add_widget(self.input)
         self.add_widget(self.send_button)
 
-    # =========================
-    # AJUSTAR TEXTO
-    # =========================
+    # =====================================
+    # AJUSTAR TEXTO LABEL
+    # =====================================
     def update_text_width(self, *args):
 
         self.output.text_size = (
@@ -79,9 +88,9 @@ class VanniaLayout(BoxLayout):
             None
         )
 
-    # =========================
+    # =====================================
     # ENVIAR MENSAJE
-    # =========================
+    # =====================================
     def send_message(self, instance):
 
         mensaje = self.input.text.strip()
@@ -92,14 +101,14 @@ class VanniaLayout(BoxLayout):
         self.output.text = "Pensando..."
 
         Clock.schedule_once(
-            lambda dt: self.ask_gemini(mensaje),
+            lambda dt: self.ask_ai(mensaje),
             0
         )
 
-    # =========================
-    # GEMINI
-    # =========================
-    def ask_gemini(self, mensaje):
+    # =====================================
+    # CONSULTAR GEMINI
+    # =====================================
+    def ask_ai(self, mensaje):
 
         try:
 
@@ -112,48 +121,64 @@ class VanniaLayout(BoxLayout):
                 timeout=30
             )
 
-            print(response.text)
+            print("STATUS:", response.status_code)
+            print("RESPONSE:", response.text)
 
-            try:
+            # =========================
+            # VALIDAR RESPUESTA
+            # =========================
+            if response.status_code != 200:
 
-                data = response.json()
+                self.output.text = (
+                    "Error servidor:\n"
+                    + str(response.status_code)
+                )
 
-                if "reply" in data:
+                return
 
-                    self.output.text = data["reply"]
+            data = response.json()
 
-                elif "error" in data:
+            # =========================
+            # RESPUESTA IA
+            # =========================
+            if "reply" in data:
 
-                    self.output.text = (
-                        "Error:\n"
-                        + data["error"]
-                    )
+                self.output.text = data["reply"]
 
-                else:
+            # =========================
+            # ERROR BACKEND
+            # =========================
+            elif "error" in data:
 
-                    self.output.text = str(data)
+                self.output.text = (
+                    "Error:\n"
+                    + data["error"]
+                )
 
-            except Exception:
+            else:
 
-                self.output.text = response.text
+                self.output.text = str(data)
 
         except Exception as e:
 
             self.output.text = (
-                "Error:\n"
+                "Error conexión:\n"
                 + str(e)
             )
 
-# =========================
+
+# =====================================
 # APP
-# =========================
+# =====================================
 class VanniaApp(App):
 
     def build(self):
         return VanniaLayout()
 
-# =========================
+
+# =====================================
 # RUN
-# =========================
+# =====================================
 if __name__ == "__main__":
+
     VanniaApp().run()
