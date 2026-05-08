@@ -14,14 +14,17 @@ orientation = portrait
 
 android.permissions = INTERNET
 
+# 🔥 Compatibilidad real Android moderno
 android.api = 33
-android.minapi = 21
+android.minapi = 24
 android.ndk_api = 21
 
+# ⚙️ arquitectura segura
 android.archs = arm64-v8a
 
 android.ndk = 25b
 
+# 🔥 clave para evitar tu error de mismatch
 android.allow_minsdk_ndkapi_mismatch = True
 
 log_level = 2
