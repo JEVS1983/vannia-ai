@@ -11,20 +11,23 @@ from kivy.clock import Clock
 # =========================
 # DESACTIVAR WARNING SSL
 # =========================
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+urllib3.disable_warnings(
+    urllib3.exceptions.InsecureRequestWarning
+)
 
 # =========================
 # URL DEL BACKEND
-# ⚠️ CAMBIA ESTO POR TU URL REAL
+# ⚠️ CAMBIA ESTO
 # =========================
-SERVER_URL = "https://TU-SERVIDOR.onrender.com/chat"
+SERVER_URL = "https://TU-APP.onrender.com/chat"
 
 # =========================
-# INTERFAZ PRINCIPAL
+# UI
 # =========================
 class VanniaLayout(BoxLayout):
 
     def __init__(self, **kwargs):
+
         super().__init__(
             orientation="vertical",
             padding=10,
@@ -32,9 +35,7 @@ class VanniaLayout(BoxLayout):
             **kwargs
         )
 
-        # =========================
-        # ÁREA RESPUESTA
-        # =========================
+        # RESPUESTA
         self.output = Label(
             text="Hola, soy Vannia AI ✨",
             size_hint_y=0.8,
@@ -42,39 +43,41 @@ class VanniaLayout(BoxLayout):
             valign="top"
         )
 
-        self.output.bind(size=self.update_text_width)
+        self.output.bind(
+            size=self.update_text_width
+        )
 
-        # =========================
         # INPUT
-        # =========================
         self.input = TextInput(
             hint_text="Escribe tu mensaje...",
             multiline=False,
             size_hint_y=0.1
         )
 
-        # =========================
         # BOTÓN
-        # =========================
         self.send_button = Button(
             text="Enviar",
             size_hint_y=0.1
         )
 
-        self.send_button.bind(on_press=self.send_message)
+        self.send_button.bind(
+            on_press=self.send_message
+        )
 
-        # =========================
-        # AGREGAR WIDGETS
-        # =========================
+        # WIDGETS
         self.add_widget(self.output)
         self.add_widget(self.input)
         self.add_widget(self.send_button)
 
     # =========================
-    # AJUSTAR TEXTO LABEL
+    # AJUSTAR TEXTO
     # =========================
     def update_text_width(self, *args):
-        self.output.text_size = (self.output.width, None)
+
+        self.output.text_size = (
+            self.output.width,
+            None
+        )
 
     # =========================
     # ENVIAR MENSAJE
@@ -88,14 +91,13 @@ class VanniaLayout(BoxLayout):
 
         self.output.text = "Pensando..."
 
-        # Ejecutar sin congelar interfaz
         Clock.schedule_once(
             lambda dt: self.ask_gemini(mensaje),
             0
         )
 
     # =========================
-    # CONSULTAR BACKEND
+    # GEMINI
     # =========================
     def ask_gemini(self, mensaje):
 
@@ -103,12 +105,13 @@ class VanniaLayout(BoxLayout):
 
             response = requests.post(
                 SERVER_URL,
-                json={"message": mensaje},
+                json={
+                    "text": mensaje
+                },
                 verify=False,
                 timeout=30
             )
 
-            # Ver respuesta real del servidor
             print(response.text)
 
             try:
@@ -116,17 +119,30 @@ class VanniaLayout(BoxLayout):
                 data = response.json()
 
                 if "reply" in data:
+
                     self.output.text = data["reply"]
 
+                elif "error" in data:
+
+                    self.output.text = (
+                        "Error:\n"
+                        + data["error"]
+                    )
+
                 else:
+
                     self.output.text = str(data)
 
             except Exception:
+
                 self.output.text = response.text
 
         except Exception as e:
 
-            self.output.text = f"Error:\n{str(e)}"
+            self.output.text = (
+                "Error:\n"
+                + str(e)
+            )
 
 # =========================
 # APP
