@@ -4,19 +4,16 @@ import os
 
 app = Flask(__name__)
 
-# API KEY desde Render
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# API KEY Groq
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# URL correcta Gemini
-GEMINI_URL = (
-    "https://generativelanguage.googleapis.com/v1beta/models/"
-    f"gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-)
+# URL Groq
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 
 @app.route("/")
 def home():
-    return "Vannia AI server online"
+    return "Vannia AI with Groq online"
 
 
 @app.route("/chat", methods=["POST"])
@@ -36,24 +33,25 @@ def chat():
                 "reply": "Empty message"
             })
 
-        payload = {
-            "contents": [
-                {
-                    "parts": [
-                        {
-                            "text": text
-                        }
-                    ]
-                }
-            ]
-        }
-
         headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
             "Content-Type": "application/json"
         }
 
+        payload = {
+            "model": "llama-3.3-70b-versatile",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": text
+                }
+            ],
+            "temperature": 0.7,
+            "max_tokens": 1024
+        }
+
         response = requests.post(
-            GEMINI_URL,
+            GROQ_URL,
             headers=headers,
             json=payload,
             timeout=30
@@ -63,22 +61,13 @@ def chat():
 
         print(result)
 
-        # Manejo de errores Gemini
+        # Error API
         if "error" in result:
             return jsonify({
-                "reply": f"Error Gemini: {result['error']['message']}"
+                "reply": f"Groq Error: {result['error']}"
             })
 
-        # Validar candidates
-        if "candidates" not in result:
-            return jsonify({
-                "reply": f"Unexpected response: {result}"
-            })
-
-        reply = (
-            result["candidates"][0]
-            ["content"]["parts"][0]["text"]
-        )
+        reply = result["choices"][0]["message"]["content"]
 
         return jsonify({
             "reply": reply
