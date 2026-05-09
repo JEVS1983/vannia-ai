@@ -1,82 +1,86 @@
 [app]
 
-# =========================
-# APP INFO
-# =========================
 title = Vannia AI
+
 package.name = vanniaai
+
 package.domain = org.vannia
 
-# =========================
-# SOURCE
-# =========================
 source.dir = .
-source.include_exts = py,png,jpg,jpeg,kv,atlas,json,txt
 
-# Excluir carpetas innecesarias
-source.exclude_dirs = tests, bin, venv, .git, __pycache__
+source.include_exts = py,png,jpg,jpeg,kv,json
 
-# =========================
-# VERSION
-# =========================
 version = 1.0
 
-# =========================
-# REQUIREMENTS
-# =========================
 requirements = python3,kivy,requests,plyer,pillow
 
-# =========================
-# SCREEN
-# =========================
 orientation = portrait
+
 fullscreen = 0
 
-# =========================
-# ANDROID
-# =========================
+# Icono opcional
+# icon.filename = icon.png
 
-# Permisos
+# Splash opcional
+# presplash.filename = presplash.png
+
+# Permisos Android
 android.permissions = INTERNET
 
-# 🔥 Android moderno
+# Android moderno
 android.api = 34
-
-# 🔥 Compatibilidad Android viejo
-android.minapi = 21
-
-# NDK estable
+android.minapi = 24
 android.ndk = 25b
 
 # Arquitectura
 android.archs = arm64-v8a
 
-# Evita conflicto minsdk/ndkapi
-android.allow_minapi_mismatch = True
-
 # AndroidX
 android.enable_androidx = True
+
+# Evita conflictos
+android.accept_sdk_license = True
+
+# Mantener pantalla activa
+android.wakelock = False
+
+# Logs
+log_level = 2
+
+# Build limpio
+p4a.branch = master
+
+# Compilar en modo debug
+# android.release_artifact = apk
+
+# Tamaño ventana desktop
+window.width = 400
+window.height = 700
+
+# Evitar empaquetar basura
+source.exclude_dirs = tests, bin, venv, .git, __pycache__
 
 # Copiar librerías
 android.copy_libs = 1
 
-# Entry point Android
+# Mejor compatibilidad
+android.gradle_dependencies =
+
+# Tema
+android.apptheme = "@android:style/Theme.NoTitleBar"
+
+# Entrada Android
 android.entrypoint = org.kivy.android.PythonActivity
 
-# Tema Android
-android.apptheme = @android:style/Theme.NoTitleBar
+# Orientación
+orientation = portrait
 
-# =========================
-# OPTIONAL ICONS
-# =========================
+# No usar setup.py
+p4a.bootstrap = sdl2
 
-# icon.filename = %(source.dir)s/icon.png
-# presplash.filename = %(source.dir)s/presplash.png
 
-# =========================
-# BUILD
-# =========================
 [buildozer]
 
 log_level = 2
-warn_on_root = 1
+
+warn_on_root = 0
