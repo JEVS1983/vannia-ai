@@ -1,4 +1,4 @@
-```ini
+```text
 [app]
 
 title = Vannia AI
@@ -6,7 +6,7 @@ package.name = vanniaai
 package.domain = org.vannia
 
 source.dir = .
-source.include_exts = py,png,jpg,kv,atlas
+source.include_exts = py,png,jpg,jpeg,kv,atlas
 
 version = 1.0
 
@@ -28,5 +28,12 @@ android.archs = arm64-v8a
 p4a.bootstrap = sdl2
 
 log_level = 2
+warn_on_root = 1
+
+
+[buildozer]
+
+log_level = 2
+
 warn_on_root = 1
 ```
