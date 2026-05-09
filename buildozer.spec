@@ -1,4 +1,3 @@
-```text
 [app]
 
 title = Vannia AI
@@ -19,21 +18,3 @@ fullscreen = 0
 android.api = 34
 android.minapi = 24
 android.sdk = 34
-android.ndk = 25b
-
-android.permissions = INTERNET
-
-android.archs = arm64-v8a
-
-p4a.bootstrap = sdl2
-
-log_level = 2
-warn_on_root = 1
-
-
-[buildozer]
-
-log_level = 2
-
-warn_on_root = 1
-```
