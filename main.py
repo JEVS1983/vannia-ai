@@ -5,39 +5,32 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.clock import Clock
-from kivy.core.window import Window
 
-import threading
 import requests
+import threading
 
-# URL DE RENDER
 SERVER_URL = "https://vannia-ai.onrender.com/chat"
 
-Window.clearcolor = (0.08, 0.08, 0.08, 1)
 
-
-class ChatUI(BoxLayout):
+class ChatLayout(BoxLayout):
 
     def __init__(self, **kwargs):
-        super().__init__(orientation="vertical", padding=10, spacing=10, **kwargs)
+        super().__init__(orientation="vertical", spacing=10, padding=10, **kwargs)
 
         self.output = Label(
             text="Vannia AI lista",
-            size_hint_y=0.8,
-            halign="left",
-            valign="top",
-            text_size=(Window.width - 40, None),
+            size_hint=(1, 0.8)
         )
 
         self.input = TextInput(
-            hint_text="Escribe aquí...",
+            hint_text="Escribe un mensaje",
             multiline=False,
-            size_hint_y=0.1
+            size_hint=(1, 0.1)
         )
 
         self.button = Button(
             text="Enviar",
-            size_hint_y=0.1
+            size_hint=(1, 0.1)
         )
 
         self.button.bind(on_press=self.send_message)
@@ -56,12 +49,13 @@ class ChatUI(BoxLayout):
         self.input.text = ""
 
         threading.Thread(
-            target=self.ask_server,
+            target=self.ask_ai,
             args=(text,),
             daemon=True
         ).start()
 
-    def ask_server(self, text):
+    def ask_ai(self, text):
+
         try:
             response = requests.post(
                 SERVER_URL,
@@ -72,25 +66,27 @@ class ChatUI(BoxLayout):
             data = response.json()
 
             if "reply" in data:
-                reply = data["reply"]
+                result = data["reply"]
+
             elif "error" in data:
-                reply = "Error: " + str(data["error"])
+                result = "Error: " + str(data["error"])
+
             else:
-                reply = "Respuesta inválida"
+                result = "Respuesta inválida"
 
         except Exception as e:
-            reply = "Error conexión: " + str(e)
+            result = "Error conexión: " + str(e)
 
-        Clock.schedule_once(lambda dt: self.update_reply(reply))
+        Clock.schedule_once(lambda dt: self.update_label(result))
 
-    def update_reply(self, text):
+    def update_label(self, text):
         self.output.text = text
 
 
 class VanniaApp(App):
 
     def build(self):
-        return ChatUI()
+        return ChatLayout()
 
 
 if __name__ == "__main__":
