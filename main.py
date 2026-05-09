@@ -1,137 +1,90 @@
+```python
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
+from kivy.core.window import Window
 
-import requests
 import threading
+import requests
 
-
-# URL de tu servidor Render
+# URL DE RENDER
 SERVER_URL = "https://vannia-ai.onrender.com/chat"
+
+Window.clearcolor = (0.08, 0.08, 0.08, 1)
 
 
 class ChatUI(BoxLayout):
 
     def __init__(self, **kwargs):
-        super().__init__(orientation="vertical", spacing=10, padding=10, **kwargs)
+        super().__init__(orientation="vertical", padding=10, spacing=10, **kwargs)
 
-        # Área de chat
-        self.scroll = ScrollView(size_hint=(1, 0.9))
-
-        self.chat_layout = GridLayout(
-            cols=1,
-            spacing=10,
-            size_hint_y=None
-        )
-
-        self.chat_layout.bind(minimum_height=self.chat_layout.setter("height"))
-
-        self.scroll.add_widget(self.chat_layout)
-
-        self.add_widget(self.scroll)
-
-        # Caja inferior
-        bottom = BoxLayout(
-            orientation="horizontal",
-            size_hint=(1, 0.1),
-            spacing=10
-        )
-
-        self.input_text = TextInput(
-            hint_text="Escribe tu mensaje...",
-            multiline=False
-        )
-
-        self.send_button = Button(
-            text="Enviar",
-            size_hint=(0.3, 1)
-        )
-
-        self.send_button.bind(on_press=self.send_message)
-
-        bottom.add_widget(self.input_text)
-        bottom.add_widget(self.send_button)
-
-        self.add_widget(bottom)
-
-        self.add_message("Vannia", "Hola 💖 Soy Vannia AI")
-
-    def add_message(self, sender, message):
-
-        text = f"{sender}: {message}"
-
-        label = Label(
-            text=text,
-            size_hint_y=None,
+        self.output = Label(
+            text="Vannia AI lista",
+            size_hint_y=0.8,
             halign="left",
-            valign="middle"
+            valign="top",
+            text_size=(Window.width - 40, None),
         )
 
-        label.bind(
-            width=lambda *x: label.setter("text_size")(label, (label.width, None))
+        self.input = TextInput(
+            hint_text="Escribe aquí...",
+            multiline=False,
+            size_hint_y=0.1
         )
 
-        label.texture_update()
+        self.button = Button(
+            text="Enviar",
+            size_hint_y=0.1
+        )
 
-        label.height = label.texture_size[1] + 30
+        self.button.bind(on_press=self.send_message)
 
-        self.chat_layout.add_widget(label)
-
-        Clock.schedule_once(lambda dt: setattr(self.scroll, 'scroll_y', 0))
+        self.add_widget(self.output)
+        self.add_widget(self.input)
+        self.add_widget(self.button)
 
     def send_message(self, instance):
+        text = self.input.text.strip()
 
-        user_text = self.input_text.text.strip()
-
-        if user_text == "":
+        if text == "":
             return
 
-        self.add_message("Tú", user_text)
-
-        self.input_text.text = ""
+        self.output.text = "Pensando..."
+        self.input.text = ""
 
         threading.Thread(
-            target=self.get_ai_response,
-            args=(user_text,),
+            target=self.ask_server,
+            args=(text,),
             daemon=True
         ).start()
 
-    def get_ai_response(self, text):
-
+    def ask_server(self, text):
         try:
-
             response = requests.post(
                 SERVER_URL,
                 json={"text": text},
-                timeout=30
+                timeout=60
             )
 
             data = response.json()
 
             if "reply" in data:
-
-                ai_text = data["reply"]
-
+                reply = data["reply"]
             elif "error" in data:
-
-                ai_text = f"Error: {data['error']}"
-
+                reply = "Error: " + str(data["error"])
             else:
-
-                ai_text = "Respuesta no válida del servidor"
+                reply = "Respuesta inválida"
 
         except Exception as e:
+            reply = "Error conexión: " + str(e)
 
-            ai_text = f"Error conexión: {str(e)}"
+        Clock.schedule_once(lambda dt: self.update_reply(reply))
 
-        Clock.schedule_once(
-            lambda dt: self.add_message("Vannia", ai_text)
-        )
+    def update_reply(self, text):
+        self.output.text = text
 
 
 class VanniaApp(App):
@@ -142,3 +95,4 @@ class VanniaApp(App):
 
 if __name__ == "__main__":
     VanniaApp().run()
+```
