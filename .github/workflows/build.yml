@@ -14,7 +14,6 @@ jobs:
       ANDROIDSDK: /usr/local/lib/android/sdk
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-      JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17*/x64
 
     steps:
       - name: Checkout repository
@@ -39,7 +38,6 @@ jobs:
             zip \
             unzip \
             git \
-            openjdk-17-jdk \
             autoconf \
             automake \
             libtool \
@@ -70,14 +68,11 @@ jobs:
           sdkmanager --install "build-tools;33.0.2"
           sdkmanager --install "ndk;25.2.9519653"
 
-      - name: Clean old builds
-        run: |
-          rm -rf .buildozer
-          buildozer android clean
+      - name: Remove previous build cache
+        run: rm -rf .buildozer
 
       - name: Build APK
-        run: |
-          buildozer -v android debug
+        run: buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
