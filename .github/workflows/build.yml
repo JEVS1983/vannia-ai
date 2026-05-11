@@ -18,7 +18,6 @@ jobs:
         with:
           python-version: "3.10"
 
-      # JAVA 17 (IMPORTANTE)
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -66,7 +65,7 @@ jobs:
             "build-tools;33.0.2" \
             "ndk;25.2.9519653"
 
-      - name: Clean build
+      - name: Clean old builds
         run: |
           rm -rf .buildozer
           rm -rf bin
