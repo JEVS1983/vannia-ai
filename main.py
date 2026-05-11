@@ -14,38 +14,43 @@ SERVER_URL = "https://vannia-ai.onrender.com/chat"
 class ChatLayout(BoxLayout):
 
     def __init__(self, **kwargs):
-        super().__init__(orientation="vertical", spacing=10, padding=10, **kwargs)
+        super().__init__(
+            orientation="vertical",
+            spacing=10,
+            padding=10,
+            **kwargs
+        )
 
         self.output = Label(
             text="Vannia AI lista",
             size_hint=(1, 0.8)
         )
 
-        self.input_box = TextInput(
+        self.input = TextInput(
             hint_text="Escribe un mensaje",
             multiline=False,
             size_hint=(1, 0.1)
         )
 
-        self.send_button = Button(
+        self.button = Button(
             text="Enviar",
             size_hint=(1, 0.1)
         )
 
-        self.send_button.bind(on_press=self.send_message)
+        self.button.bind(on_press=self.send_message)
 
         self.add_widget(self.output)
-        self.add_widget(self.input_box)
-        self.add_widget(self.send_button)
+        self.add_widget(self.input)
+        self.add_widget(self.button)
 
     def send_message(self, instance):
-        text = self.input_box.text.strip()
+        text = self.input.text.strip()
 
         if text == "":
             return
 
         self.output.text = "Pensando..."
-        self.input_box.text = ""
+        self.input.text = ""
 
         threading.Thread(
             target=self.ask_ai,
@@ -76,7 +81,9 @@ class ChatLayout(BoxLayout):
         except Exception as e:
             result = "Error conexión: " + str(e)
 
-        Clock.schedule_once(lambda dt: self.update_label(result))
+        Clock.schedule_once(
+            lambda dt: self.update_label(result)
+        )
 
     def update_label(self, text):
         self.output.text = text
