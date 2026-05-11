@@ -13,27 +13,42 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install dependencies
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            autoconf \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev \
+            libtinfo5 \
+            cmake \
+            libffi-dev \
+            libssl-dev
+
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-
-          # VERSION IMPORTANTE
-          pip install buildozer==1.4.0
-
           pip install cython==0.29.36
+          pip install buildozer==1.5.0
 
-      - name: Clean previous builds
+      - name: Clean old builds
         run: |
           rm -rf .buildozer
           rm -rf bin
@@ -45,5 +60,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: vannia-apk
+          name: android-apk
           path: bin/*.apk
