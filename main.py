@@ -1,4 +1,3 @@
-```python
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
@@ -22,31 +21,31 @@ class ChatLayout(BoxLayout):
             size_hint=(1, 0.8)
         )
 
-        self.input = TextInput(
+        self.input_box = TextInput(
             hint_text="Escribe un mensaje",
             multiline=False,
             size_hint=(1, 0.1)
         )
 
-        self.button = Button(
+        self.send_button = Button(
             text="Enviar",
             size_hint=(1, 0.1)
         )
 
-        self.button.bind(on_press=self.send_message)
+        self.send_button.bind(on_press=self.send_message)
 
         self.add_widget(self.output)
-        self.add_widget(self.input)
-        self.add_widget(self.button)
+        self.add_widget(self.input_box)
+        self.add_widget(self.send_button)
 
     def send_message(self, instance):
-        text = self.input.text.strip()
+        text = self.input_box.text.strip()
 
         if text == "":
             return
 
         self.output.text = "Pensando..."
-        self.input.text = ""
+        self.input_box.text = ""
 
         threading.Thread(
             target=self.ask_ai,
@@ -91,4 +90,3 @@ class VanniaApp(App):
 
 if __name__ == "__main__":
     VanniaApp().run()
-```
