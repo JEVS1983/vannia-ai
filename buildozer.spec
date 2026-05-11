@@ -9,7 +9,7 @@ source.include_exts = py,png,jpg,kv,atlas
 
 version = 1.0
 
-requirements = python3,kivy,requests
+requirements = python3,kivy==2.2.1,requests
 
 orientation = portrait
 
@@ -23,13 +23,8 @@ android.archs = arm64-v8a
 
 p4a.branch = stable
 
-# IMPORTANTE
 android.accept_sdk_license = True
-
-# SOLO APK
-build_dir = .buildozer
 
 [buildozer]
 
 log_level = 2
-warn_on_root
