@@ -1,7 +1,6 @@
 [app]
 
 title = Vannia AI
-
 package.name = vanniaai
 package.domain = org.vannia
 
@@ -16,19 +15,14 @@ orientation = portrait
 
 fullscreen = 0
 
-android.permissions = INTERNET
-
-android.api = 33
+android.api = 34
 android.minapi = 24
 android.ndk = 25b
 
-p4a.branch = master
+android.accept_sdk_license = True
+
+p4a.branch = stable
+p4a.bootstrap = sdl2
 
 log_level = 2
-
-warn_on_root = 1
-
-[buildozer]
-
-log_level = 2
-warn_on_root = 1
+warn_on_root = 0
