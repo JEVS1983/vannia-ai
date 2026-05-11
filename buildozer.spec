@@ -1,10 +1,12 @@
 [app]
 
 title = Vannia AI
+
 package.name = vanniaai
 package.domain = org.vannia
 
 source.dir = .
+
 source.include_exts = py,png,jpg,kv,atlas
 
 version = 1.0
