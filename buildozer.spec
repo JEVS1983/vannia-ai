@@ -5,7 +5,7 @@ package.name = vanniaai
 package.domain = org.vanniaai
 
 source.dir = .
-source.include_exts = py,png,jpg,kv,atlas,txt,json
+source.include_exts = py,png,jpg,jpeg,kv,atlas,json,txt
 
 version = 1.0
 
@@ -15,6 +15,11 @@ orientation = portrait
 
 fullscreen = 0
 
+log_level = 2
+
+warn_on_root = 1
+
+# Android
 android.api = 34
 android.minapi = 24
 android.sdk = 34
@@ -26,26 +31,36 @@ android.permissions = INTERNET
 
 android.archs = arm64-v8a
 
-p4a.branch = stable
-
-log_level = 2
-
-warn_on_root = 1
-
-osx.python_version = 3
-osx.kivy_version = 2.2.1
-
-android.gradle_dependencies =
-
 android.enable_androidx = True
 
 android.allow_backup = True
 
-android.release_artifact = apk
+# Generar APK y NO AAB
+android.debug_artifact = apk
 
-# Evita Python 3.14
+# Evitar problemas de Python 3.14
+p4a.branch = stable
 p4a.fork = kivy
 p4a.url = https://github.com/kivy/python-for-android.git
 
-# Mantener compilación estable
+# Compilación estable
 android.skip_update = False
+
+# Archivos incluidos
+source.exclude_dirs = tests, bin, venv, .git, __pycache__
+
+# Icono (opcional)
+# icon.filename = %(source.dir)s/icon.png
+
+# Splash (opcional)
+# presplash.filename = %(source.dir)s/presplash.png
+
+# Desktop
+osx.python_version = 3
+osx.kivy_version = 2.2.1
+
+[buildozer]
+
+log_level = 2
+
+warn_on_root = 1
