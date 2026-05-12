@@ -29,7 +29,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install cython==0.29.36
-          pip install buildozer==1.5.0
+          pip install buildozer==1.4.0
+          pip install python-for-android==2023.09.16
 
       - name: Install system packages
         run: |
@@ -37,14 +38,17 @@ jobs:
           sudo apt install -y \
             git zip unzip autoconf libtool pkg-config \
             zlib1g-dev libncurses5-dev libncursesw5-dev \
-            cmake libffi-dev libssl-dev
+            cmake libffi-dev libssl-dev wget unzip
 
       - name: Install Android SDK command line tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
+
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+
           unzip commandlinetools-linux-11076708_latest.zip
+
           mv cmdline-tools latest
 
       - name: Set Android environment
@@ -54,11 +58,11 @@ jobs:
           echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
 
-      - name: Accept licenses
+      - name: Accept Android licenses
         run: |
           yes | sdkmanager --licenses
 
-      - name: Install SDK packages
+      - name: Install Android SDK packages
         run: |
           sdkmanager \
             "platform-tools" \
