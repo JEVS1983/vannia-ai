@@ -1,6 +1,6 @@
 [app]
 
-title = VanniaAI
+title = Vannia AI
 package.name = vanniaai
 package.domain = org.vannia
 
@@ -9,21 +9,22 @@ source.include_exts = py,png,jpg,kv,json
 
 version = 1.0
 
-requirements = python3==3.10.11,kivy==2.2.1,cython==0.29.36
+requirements = python3,kivy==2.3.0
 
 orientation = portrait
+
 fullscreen = 0
 
 android.api = 34
 android.minapi = 24
+android.sdk = 34
 android.ndk = 25b
-android.archs = arm64-v8a
 
 android.permissions = INTERNET
 
-android.accept_sdk_license = True
+presplash.color = #000000
 
-p4a.branch = stable
+[buildozer]
 
 log_level = 2
 
