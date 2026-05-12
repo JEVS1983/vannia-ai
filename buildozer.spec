@@ -9,14 +9,10 @@ source.include_exts = py,png,jpg,kv,json
 
 version = 1.0
 
-requirements = python3,kivy==2.3.0
+requirements = python3==3.10.11,kivy==2.2.1,cython==0.29.36
 
 orientation = portrait
-
 fullscreen = 0
-
-osx.python_version = 3
-osx.kivy_version = 2.3.0
 
 android.api = 34
 android.minapi = 24
@@ -27,7 +23,7 @@ android.permissions = INTERNET
 
 android.accept_sdk_license = True
 
-p4a.branch = master
+p4a.branch = stable
 
 log_level = 2
 
