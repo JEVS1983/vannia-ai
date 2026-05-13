@@ -16,7 +16,6 @@ orientation = portrait
 fullscreen = 0
 
 # Android
-
 android.api = 34
 android.minapi = 24
 android.ndk = 25b
@@ -27,25 +26,19 @@ android.permissions = INTERNET
 
 android.archs = arm64-v8a
 
-# Evita problemas con versiones modernas
-p4a.branch = stable
+# IMPORTANTE
+android.release_artifact = apk
+
 p4a.bootstrap = sdl2
+p4a.branch = stable
 
-# Logs
-log_level = 2
-
-# Build mode
-warn_on_root = 1
-
-# Excluir basura
 source.exclude_dirs = venv,.venv,bin,.git,__pycache__,build,.buildozer
 
-# Icono y splash (opcional)
-# icon.filename = %(source.dir)s/data/icon.png
-# presplash.filename = %(source.dir)s/data/presplash.png
+log_level = 2
+
+warn_on_root = 1
 
 [buildozer]
 
 log_level = 2
-
 bin_dir = ./bin
