@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -18,18 +18,13 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "17"
-
       - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y \
             zip \
             unzip \
+            openjdk-17-jdk \
             autoconf \
             libtool \
             pkg-config \
@@ -40,18 +35,12 @@ jobs:
             libffi-dev \
             libssl-dev
 
-      - name: Install Python packages
+      - name: Install Buildozer
         run: |
           python -m pip install --upgrade pip
-          pip install "cython<3"
+          pip install cython==0.29.36
           pip install buildozer==1.5.0
-
-      - name: Accept Android SDK licenses
-        run: |
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-
-          yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses || true
+          pip install python-for-android==2024.01.21
 
       - name: Clean previous builds
         run: |
@@ -65,5 +54,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: vannia-ai-apk
+          name: android-apk
           path: bin/*.apk
