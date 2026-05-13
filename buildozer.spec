@@ -1,103 +1,51 @@
 [app]
 
 title = Vannia AI
-
 package.name = vanniaai
-package.domain = org.vannia.ai
+package.domain = org.vannia
 
 source.dir = .
-source.include_exts = py,png,jpg,jpeg,kv,atlas,json,txt
-source.exclude_dirs = tests,.git,__pycache__,venv,.venv,bin
+source.include_exts = py,png,jpg,kv,atlas,ttf,json
 
 version = 1.0
 
-requirements = python3==3.10.11,kivy==2.2.1,requests,urllib3,idna,chardet,certifi,filetype,six
+requirements = python3,kivy==2.2.1,requests,urllib3,idna,chardet,certifi,filetype,six
 
 orientation = portrait
 
 fullscreen = 0
 
+# Android
+
 android.api = 34
 android.minapi = 24
 android.ndk = 25b
 
-p4a.bootstrap = sdl2
-p4a.branch = master
+android.accept_sdk_license = True
 
 android.permissions = INTERNET
 
-android.enable_androidx = True
-android.accept_sdk_license = True
-
 android.archs = arm64-v8a
 
-android.copy_libs = 1
+# Evita problemas con versiones modernas
+p4a.branch = stable
+p4a.bootstrap = sdl2
 
-android.presplash_color = #000000
-android.window_background_color = #000000
-
-android.apptheme = Theme.NoTitleBar
-
-android.allow_backup = True
-
-android.logcat_filters = *:S python:D
-
-android.wakelock = False
-
-android.private_storage = True
-
-android.numeric_version = 1
-
+# Logs
 log_level = 2
 
+# Build mode
 warn_on_root = 1
 
-build_mode = debug
+# Excluir basura
+source.exclude_dirs = venv,.venv,bin,.git,__pycache__,build,.buildozer
 
-p4a.extra_args = --ignore-setup-py
-
-
-# ---------------------------------
-# ICONS / SPLASH
-# ---------------------------------
-
+# Icono y splash (opcional)
 # icon.filename = %(source.dir)s/data/icon.png
 # presplash.filename = %(source.dir)s/data/presplash.png
-
-
-# ---------------------------------
-# EXTRA FILES
-# ---------------------------------
-
-android.add_jars =
-android.add_activities =
-android.add_src =
-android.meta_data =
-
-
-# ---------------------------------
-# SERVICES
-# ---------------------------------
-
-services =
-
-
-# ---------------------------------
-# OUYA
-# ---------------------------------
-
-ouya.category = GAME
-ouya.icon.filename = %(source.dir)s/data/ouya_icon.png
-
-
-# ---------------------------------
-# BUILD OPTIONS
-# ---------------------------------
-
-android.release_artifact = apk
-
 
 [buildozer]
 
 log_level = 2
-warn_on_root = 1
+
+bin_dir = ./bin
