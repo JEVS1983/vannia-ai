@@ -44,14 +44,7 @@ jobs:
           pip install buildozer==1.5.0
           pip install "python-for-android==2024.01.21"
 
-      - name: Accept Android licenses
-        run: |
-          mkdir -p ~/.android
-          echo '24333f8a63b6825ea9c5514f83c2829b004d1fee' > ~/.android/repositories.cfg || true
-
       - name: Build APK
-        env:
-          P4A_RELEASE_KEYSTORE: ""
         run: |
           buildozer android debug
 
