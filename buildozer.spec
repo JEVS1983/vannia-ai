@@ -2,62 +2,49 @@
 
 title = Vannia AI
 package.name = vanniaai
-package.domain = org.vanniaai
+package.domain = org.vannia
 
 source.dir = .
-source.include_exts = py,png,jpg,jpeg,kv,atlas,json,txt
+source.include_exts = py,png,jpg,kv,atlas,ttf,json
 
 version = 1.0
 
-requirements = python3==3.10.11,kivy==2.2.1
+requirements = python3,kivy==2.2.1
 
 orientation = portrait
 
 fullscreen = 0
 
-log_level = 2
-
-warn_on_root = 1
-
-# Android
 android.api = 34
 android.minapi = 24
 android.sdk = 34
 android.ndk = 25b
-
 android.accept_sdk_license = True
 
 android.permissions = INTERNET
 
 android.archs = arm64-v8a
 
-android.enable_androidx = True
+android.release_artifact = apk
 
-android.allow_backup = True
+p4a.branch = master
 
-# Generar APK y NO AAB
-android.debug_artifact = apk
+log_level = 2
 
-# Evitar problemas de Python 3.14
-p4a.branch = stable
-p4a.fork = kivy
-p4a.url = https://github.com/kivy/python-for-android.git
+warn_on_root = 1
 
-# Compilación estable
-android.skip_update = False
+# (list) Presplash of the application
+#presplash.filename = %(source.dir)s/data/presplash.png
 
-# Archivos incluidos
-source.exclude_dirs = tests, bin, venv, .git, __pycache__
+# (list) Icon of the application
+#icon.filename = %(source.dir)s/data/icon.png
 
-# Icono (opcional)
-# icon.filename = %(source.dir)s/icon.png
+# (str) Supported orientation (one of landscape, portrait, portrait-reverse or landscape-reverse)
+orientation = portrait
 
-# Splash (opcional)
-# presplash.filename = %(source.dir)s/presplash.png
+# (bool) Indicate if the application should be fullscreen or not
+fullscreen = 0
 
-# Desktop
-osx.python_version = 3
-osx.kivy_version = 2.2.1
 
 [buildozer]
 
