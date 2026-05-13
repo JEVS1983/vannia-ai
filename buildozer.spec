@@ -1,44 +1,70 @@
-[app]
+name: Build Android APK
 
-title = Vannia AI
-package.name = vanniaai
-package.domain = org.vannia
+on:
+  push:
+    branches:
+      - main
 
-source.dir = .
-source.include_exts = py,png,jpg,kv,atlas,ttf,json
+jobs:
+  build:
+    runs-on: ubuntu-22.04
 
-version = 1.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-requirements = python3,kivy==2.2.1,requests,urllib3,idna,chardet,certifi,filetype,six
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
 
-orientation = portrait
+      - name: Install dependencies
+        run: |
+          sudo apt update
 
-fullscreen = 0
+          sudo apt install -y \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            autoconf \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev \
+            cmake \
+            libffi-dev \
+            libssl-dev \
+            git \
+            build-essential \
+            ccache
 
-# Android
-android.api = 34
-android.minapi = 24
-android.ndk = 25b
+      - name: Install Python tools
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
 
-android.accept_sdk_license = True
+          pip install cython==0.29.36
+          pip install buildozer==1.5.0
 
-android.permissions = INTERNET
+          # IMPORTANTE:
+          # versión moderna compatible con AAB
+          pip install python-for-android==2024.1.21
 
-android.archs = arm64-v8a
+      - name: Accept Android licenses
+        run: |
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
 
-# IMPORTANTE
-android.release_artifact = apk
+      - name: Clean previous builds
+        run: |
+          buildozer android clean
 
-p4a.bootstrap = sdl2
-p4a.branch = stable
+      - name: Build APK
+        run: |
+          buildozer android debug
 
-source.exclude_dirs = venv,.venv,bin,.git,__pycache__,build,.buildozer
-
-log_level = 2
-
-warn_on_root = 1
-
-[buildozer]
-
-log_level = 2
-bin_dir = ./bin
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: bin/*.apk
