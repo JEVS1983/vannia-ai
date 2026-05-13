@@ -1,6 +1,7 @@
 [app]
 
 title = Vannia AI
+
 package.name = vanniaai
 package.domain = org.vannia
 
@@ -9,9 +10,10 @@ source.include_exts = py,png,jpg,jpeg,kv,atlas,json,ttf
 
 version = 1.0
 
-requirements = python3==3.10.11,kivy==2.2.1
+requirements = python3,kivy==2.2.1,requests,urllib3,idna,chardet,certifi,filetype,six
 
 orientation = portrait
+
 fullscreen = 0
 
 android.api = 34
@@ -29,14 +31,13 @@ android.release_artifact = apk
 
 p4a.branch = master
 
-# evita Python 3.14
-osx.python_version = 3
-
 log_level = 2
+
 warn_on_root = 1
 
 
 [buildozer]
 
 log_level = 2
+
 warn_on_root = 1
